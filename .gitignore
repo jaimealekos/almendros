@@ -1,0 +1,16 @@
+# Datos de una instalación real: nunca deben entrar en el repositorio
+almendros.json
+negativos.json
+copias/
+_backups/
+_bbdd/
+
+# Notas de trabajo y configuración local
+_llm/
+.claude/
+capturas/.tmp/
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store

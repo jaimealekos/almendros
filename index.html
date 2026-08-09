@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Almendros · film photography logbook / cuaderno de carretes</title>
+<meta name="description" content="Free open-source film photography logbook in a single HTML file. Track your 35mm and 120 rolls: camera, film stock, push/pull, lab or home development, dates and notes. No account, no server, no subscription — your data stays in your own folder.">
+<meta name="author" content="Jaime Alekos">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#090a0b">
+<link rel="canonical" href="https://jaimealekos.github.io/almendros/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Almendros">
+<meta property="og:title" content="Almendros · a film logbook in a single file">
+<meta property="og:description" content="Track every roll of film you shoot — camera, stock, push/pull, lab or home development — in one HTML file that saves to your own folder. No account, no server, no subscription.">
+<meta property="og:url" content="https://jaimealekos.github.io/almendros/">
+<meta property="og:image" content="https://jaimealekos.github.io/almendros/capturas/01-general.png">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23090a0b'/%3E%3Crect x='11' y='4' width='16' height='24' fill='%23ff5b14'/%3E%3Cg fill='%23ff5b14'%3E%3Crect x='4' y='5' width='4' height='3'/%3E%3Crect x='4' y='11' width='4' height='3'/%3E%3Crect x='4' y='17' width='4' height='3'/%3E%3Crect x='4' y='23' width='4' height='3'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   ALMENDROS · lenguaje visual — «la tira»
+   · La página es una tira de película: lomo perforado fijo a la izquierda
+     con el nombre en vertical, y los carretes como fotogramas seguidos.
+   · Nada redondeado, nada con sombra, nada desenfocado, nada con grano.
+     La textura viene de la estructura: filetes, perforaciones, tipografía.
+   · Negro frío y naranja de máscara de negativo, plano y saturado.
+     El naranja significa SIEMPRE «atención»: marca, acción y «revelar».
+   · Sin etiquetas en versalitas espaciadas. Rótulos en minúscula
+     monoespaciada, como un impreso técnico.
+   · La vía de proceso hace tres trabajos a la vez: leyenda, filtro y
+     recuento por fase.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root{
+  --negro:#090a0b; --carbon:#101214; --panel:#15181a;
+  --linea:#1f2427; --linea2:#333a3f;
+  --texto:#eef1f2; --texto2:#8d979c; --texto3:#5c666b;
+  --naranja:#ff5b14; --naranja2:#8c3208;
+  --c-Cargado:#2fbfa8; --c-Revelar:#ff5b14; --c-Revelando:#9b6bf5;
+  --c-Revelado:#2e8fff; --c-Recogido:#e8b62c; --c-Escaneado:#3fbf5f;
+  --c-Archivado:#5a6169;
+  --rojo:#ff4d3d;
+  --f-cond:Bahnschrift,"Arial Narrow","Helvetica Neue Condensed","Franklin Gothic Medium",Impact,sans-serif;
+  --f-mono:"Cascadia Mono","SF Mono",Consolas,"Roboto Mono","DejaVu Sans Mono",monospace;
+  --f-prosa:"Segoe UI",system-ui,-apple-system,sans-serif;
+  --lomo:56px;
+}
+:root[data-tema="claro"]{
+  --negro:#fbfaf8; --carbon:#f2f0ec; --panel:#ffffff;
+  --linea:#dcd8d1; --linea2:#b3aca1;
+  --texto:#14161a; --texto2:#5d646a; --texto3:#8b9299;
+  --naranja:#e64500; --naranja2:#ffb491;
+  --c-Cargado:#00786a; --c-Revelar:#e64500; --c-Revelando:#6a3fd4;
+  --c-Revelado:#0a63c4; --c-Recogido:#9a7205; --c-Escaneado:#1f7d3c;
+  --c-Archivado:#6e767c;
+  --rojo:#cc2a18;
+}
+
+*{box-sizing:border-box; margin:0; padding:0; border-radius:0}
+html{background:var(--negro)}
+body{
+  background:var(--negro); color:var(--texto);
+  font:14px/1.5 var(--f-mono);
+  padding:0 0 0 var(--lomo); min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--naranja); color:#000}
+a{color:var(--naranja)}
+
+/* ── el lomo: canto perforado de la película ────────────────────── */
+#lomo{
+  position:fixed; left:0; top:0; bottom:0; width:var(--lomo); z-index:5;
+  border-right:1px solid var(--linea); background:var(--carbon);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='30'%3E%3Crect x='5' y='6' width='12' height='17' rx='1.5' fill='%231f2427'/%3E%3C/svg%3E");
+  background-repeat:repeat-y; background-position:5px 0;
+  display:flex; align-items:center; justify-content:flex-end;
+  padding-right:9px;
+}
+:root[data-tema="claro"] #lomo{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='30'%3E%3Crect x='5' y='6' width='12' height='17' rx='1.5' fill='%23dcd8d1'/%3E%3C/svg%3E");
+}
+#lomo .rotulo{
+  writing-mode:vertical-rl; transform:rotate(180deg);
+  font:700 11px/1 var(--f-cond); font-stretch:75%;
+  letter-spacing:.42em; text-transform:uppercase; color:var(--naranja);
+  white-space:nowrap; user-select:none; margin:0;
+}
+#lomo .rotulo em{font-style:normal; color:var(--texto3)}
+
+/* ── lienzo ─────────────────────────────────────────────────────── */
+#lienzo{max-width:1460px; padding:0 34px 120px 26px}
+
+.cima{
+  display:flex; align-items:flex-end; gap:26px; flex-wrap:wrap;
+  padding:26px 0 12px; border-bottom:2px solid var(--linea2);
+}
+.busca{flex:1; min-width:230px; display:flex; align-items:baseline; gap:11px}
+.busca .pre{font:12px/1 var(--f-mono); color:var(--texto3); flex:none}
+.busca input{
+  flex:1; min-width:0; background:none; border:none; color:var(--texto);
+  font:15px/1.4 var(--f-mono); outline:none; padding:2px 0;
+}
+.busca input::placeholder{color:var(--texto3)}
+.busca:focus-within .pre{color:var(--naranja)}
+.cima-der{display:flex; align-items:center; gap:10px; position:relative}
+
+button{
+  background:none; color:var(--texto); border:1px solid var(--linea2);
+  padding:6px 12px; font:13px/1.35 var(--f-mono); cursor:pointer;
+  transition:color .12s, border-color .12s, background .12s;
+}
+button:hover{border-color:var(--texto2)}
+button:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible, [tabindex]:focus-visible{outline:2px solid var(--naranja); outline-offset:2px}
+button.primario{
+  background:var(--naranja); border-color:var(--naranja); color:#0a0500;
+  font:700 12px/1.35 var(--f-cond); letter-spacing:.13em; text-transform:uppercase;
+  padding:8px 15px;
+}
+button.primario:hover{filter:brightness(1.12)}
+button.desnudo{border-color:transparent; color:var(--texto2); padding:6px 8px}
+button.desnudo:hover{color:var(--texto); border-color:transparent}
+button.peligro{border-color:transparent; color:var(--rojo)}
+button.peligro:hover{border-color:var(--rojo)}
+
+.estado-linea{
+  display:flex; gap:18px; align-items:baseline; flex-wrap:wrap;
+  padding:9px 0; font:11.5px/1.4 var(--f-mono); color:var(--texto3);
+}
+.est-ok{color:#4f9d63} .est-guardando{color:var(--texto2)} .est-aviso{color:var(--naranja)}
+
+/* ── cámaras: índice impreso separado por barras ────────────────── */
+.camaras{display:flex; flex-wrap:wrap; align-items:center; padding:12px 0 4px; gap:0}
+.camaras button{
+  border:none; padding:4px 0; color:var(--texto2); font:13.5px/1.4 var(--f-mono);
+}
+.camaras button:hover{color:var(--texto)}
+.camaras button.on{color:var(--naranja)}
+.camaras .barra{color:var(--linea2); padding:0 9px; user-select:none; font-size:13px}
+.camaras .quita{margin-left:6px; color:var(--texto3); opacity:0; transition:opacity .12s}
+.camaras button:hover .quita{opacity:1}
+.camaras .quita:hover{color:var(--rojo)}
+@media (hover:none){ .camaras .quita{opacity:.6} }
+.camaras .anadir{margin-left:16px; color:var(--texto3); border:1px solid var(--linea); padding:3px 9px; font-size:12px}
+.camaras .anadir:hover{color:var(--naranja); border-color:var(--naranja2)}
+.cam-nueva{
+  margin-left:16px; background:var(--carbon); border:1px solid var(--naranja);
+  color:var(--texto); padding:3px 9px; font:13px var(--f-mono); outline:none; width:160px;
+}
+
+/* ── la vía: leyenda + filtro + recuento por fase ───────────────── */
+.via{
+  display:flex; margin:18px 0 6px; padding-bottom:4px;
+  overflow-x:auto; scrollbar-width:thin;
+}
+.parada{
+  flex:1 0 auto; min-width:88px; border:none; padding:0; position:relative;
+  display:flex; flex-direction:column; align-items:center; gap:0; background:none;
+}
+.parada .cuenta{
+  font:15px/22px var(--f-mono); color:var(--texto2); font-variant-numeric:tabular-nums;
+}
+.parada.vacia .cuenta{color:var(--texto3); opacity:.45}
+.parada .riel{display:block; width:100%; height:14px; position:relative}
+.parada .riel::before{
+  content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--linea2);
+}
+.parada:first-child .riel::before{left:50%}
+.parada:last-child .riel::before{right:50%}
+.parada .marca{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:9px; height:9px; background:var(--tono, var(--texto3)); z-index:1;
+}
+.parada.vacia .marca{background:var(--negro); box-shadow:inset 0 0 0 1px var(--linea2)}
+.parada .nombre{
+  font:700 10px/1.4 var(--f-cond); letter-spacing:.13em; text-transform:uppercase;
+  color:var(--texto3); margin-top:7px; white-space:nowrap;
+}
+.parada:hover .nombre{color:var(--texto2)}
+.parada.on .nombre{color:var(--texto)}
+.parada.on .marca{
+  width:15px; height:15px; box-shadow:0 0 0 3px var(--negro), 0 0 0 4px var(--tono, var(--texto2));
+}
+.parada.late .marca{animation:respira 5.5s ease-in-out infinite}
+@keyframes respira{0%,100%{opacity:.42} 50%{opacity:1}}
+
+.mando{
+  display:flex; justify-content:space-between; align-items:baseline; gap:20px;
+  border-top:1px solid var(--linea); padding-top:9px; margin-top:6px; flex-wrap:wrap;
+}
+.vista{display:flex; align-items:baseline; gap:0; font:12px/1 var(--f-mono)}
+.vista button{border:none; padding:4px 0; color:var(--texto3)}
+.vista button:hover{color:var(--texto2)}
+.vista button.on{color:var(--texto)}
+.vista .barra{color:var(--linea2); padding:0 8px; user-select:none}
+
+/* ── la tira de fotogramas ──────────────────────────────────────── */
+.grupo{margin-top:34px}
+.grupo-cab{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+  border-bottom:5px solid var(--texto); padding-bottom:2px;
+}
+.grupo-cab h2{
+  font:700 34px/.92 var(--f-cond); font-stretch:75%; letter-spacing:-.005em;
+  text-transform:uppercase; color:var(--texto);
+}
+.grupo-cab .cuenta{
+  font:11px/1.6 var(--f-mono); color:var(--texto3); white-space:nowrap;
+  font-variant-numeric:tabular-nums; padding-bottom:4px;
+}
+
+.carrete{
+  display:grid;
+  grid-template-columns:196px minmax(150px,1fr) 152px 176px minmax(170px,1.35fr);
+  gap:18px; align-items:baseline; padding:14px 0 14px 20px;
+  border-bottom:1px solid var(--linea); position:relative;
+  cursor:pointer; background:none;
+}
+.carrete::before{                       /* el fotograma: bloque de color continuo */
+  content:''; position:absolute; left:-26px; top:0; bottom:0; width:8px;
+  background:var(--tono);
+}
+.carrete:hover{background:var(--carbon)}
+.carrete:hover::before{left:-26px; width:14px}
+
+.codigo{
+  font:700 21px/1 var(--f-cond); font-stretch:87.5%; letter-spacing:.005em;
+  color:var(--texto); display:block;
+}
+.bajo-codigo{
+  display:block; font:10.5px/1.7 var(--f-mono); color:var(--texto3); margin-top:5px;
+  font-variant-numeric:tabular-nums;
+}
+.peli{font:13.5px/1.45 var(--f-mono); color:var(--texto)}
+.iso{color:var(--naranja); margin-left:8px; font-size:12px}
+.etiqueta{
+  display:inline-block; background:var(--tono); color:#08090a;
+  font:700 9.5px/1 var(--f-cond); letter-spacing:.13em; text-transform:uppercase;
+  padding:5px 8px; white-space:nowrap; cursor:pointer;
+}
+:root[data-tema="claro"] .etiqueta{color:#fff}
+.etiqueta .flecha{opacity:0; display:inline-block; width:0; transition:opacity .15s, width .15s}
+.carrete:hover .etiqueta .flecha{opacity:.75; width:10px}
+.etiqueta.late{animation:respira 5.5s ease-in-out infinite}
+.receta{display:block; font:10.5px/1.6 var(--f-mono); color:var(--texto3); margin-top:7px}
+.fechas{font:11.5px/1.7 var(--f-mono); color:var(--texto3); font-variant-numeric:tabular-nums}
+.fechas b{color:var(--texto2); font-weight:400}
+.fechas .flecha{color:var(--linea2); padding:0 4px}
+.notas{
+  font:12px/1.6 var(--f-mono); color:var(--texto2);
+  overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+.marcas{margin-right:8px; color:var(--texto3); white-space:nowrap}
+.marcas a{color:var(--texto3); text-decoration:none}
+.marcas a:hover{color:var(--naranja)}
+@media (prefers-reduced-motion:reduce){
+  .etiqueta.late, .parada.late .marca{animation:none; opacity:1}
+}
+
+/* ── contador a cero ────────────────────────────────────────────── */
+#vacio{padding:90px 0 60px; max-width:520px}
+#vacio[hidden]{display:none}
+#vacio .cero{
+  font:700 96px/.8 var(--f-cond); font-stretch:75%; color:transparent;
+  -webkit-text-stroke:2px var(--linea2); letter-spacing:-.02em; margin-bottom:26px;
+}
+#vacio h3{font:700 21px/1.2 var(--f-cond); font-stretch:87.5%; text-transform:uppercase; margin-bottom:12px}
+#vacio p{font:13.5px/1.75 var(--f-mono); color:var(--texto3)}
+
+footer{
+  margin-top:60px; padding-top:14px; border-top:1px solid var(--linea);
+  display:flex; gap:18px; flex-wrap:wrap;
+  font:10.5px/1.6 var(--f-mono); color:var(--texto3);
+}
+
+/* ── menú: panel de canto vivo ──────────────────────────────────── */
+#menu{
+  position:absolute; right:0; top:calc(100% + 9px); z-index:30; min-width:274px;
+  background:var(--panel); border:1px solid var(--linea2); border-top:3px solid var(--naranja);
+  padding:6px; text-align:left;
+}
+#menu[hidden]{display:none}
+#menu .sec{font:10.5px/1 var(--f-mono); color:var(--texto3); padding:12px 10px 6px}
+#menu button.item{
+  display:block; width:100%; text-align:left; border:none; padding:8px 10px;
+  font:13px/1.4 var(--f-mono); color:var(--texto);
+}
+#menu button.item:hover{background:var(--carbon); color:var(--naranja)}
+#menu hr{border:none; border-top:1px solid var(--linea); margin:5px 0}
+.segmento{display:flex; gap:0; padding:2px 10px 8px}
+.segmento button{
+  flex:1; border:1px solid var(--linea2); border-right-width:0; padding:6px 4px;
+  font:700 10px/1.2 var(--f-cond); letter-spacing:.13em; text-transform:uppercase;
+  color:var(--texto3);
+}
+.segmento button:last-child{border-right-width:1px}
+.segmento button.on{background:var(--naranja); border-color:var(--naranja); color:#0a0500}
+
+/* ── cajón lateral (la ficha) ───────────────────────────────────── */
+.velo{
+  position:fixed; inset:0; background:rgba(0,0,0,.55); display:none;
+  justify-content:flex-end; z-index:40;
+}
+:root[data-tema="claro"] .velo{background:rgba(30,26,20,.34)}
+.velo.abierto{display:flex}
+.ficha{
+  width:min(500px,100%); height:100%; background:var(--carbon);
+  border-left:3px solid var(--naranja); display:flex; flex-direction:column;
+}
+.ficha-cab{padding:22px 26px 16px; border-bottom:1px solid var(--linea2)}
+.ficha-cab .fila1{display:flex; align-items:flex-start; justify-content:space-between; gap:16px}
+.ficha-cab h3{font:700 27px/1 var(--f-cond); font-stretch:87.5%; text-transform:uppercase}
+.ficha-cab .sub{font:11.5px/1.6 var(--f-mono); color:var(--texto3); margin-top:8px}
+.ficha-cuerpo{padding:6px 26px 26px; overflow-y:auto; flex:1}
+.ficha-pie{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:14px 26px; border-top:1px solid var(--linea2);
+}
+.ficha-pie .der{display:flex; gap:9px; margin-left:auto}
+
+.apartado{
+  display:flex; align-items:baseline; gap:9px; margin:24px 0 6px;
+  padding-bottom:5px; border-bottom:2px solid var(--linea2);
+  font:12px/1.4 var(--f-mono); color:var(--texto2);
+}
+.apartado .n{color:var(--naranja)}
+.apartado:first-child{margin-top:10px}
+.apartado .flujo-sel{display:flex; margin-left:auto}
+.flujo-sel button{
+  border:1px solid var(--linea2); border-right-width:0; padding:3px 10px;
+  font:700 9.5px/1.4 var(--f-cond); letter-spacing:.12em; text-transform:uppercase;
+  color:var(--texto3);
+}
+.flujo-sel button:last-child{border-right-width:1px}
+.flujo-sel button.on{background:var(--naranja); border-color:var(--naranja); color:#0a0500}
+
+.campo{
+  display:grid; grid-template-columns:104px 1fr; align-items:baseline; gap:14px;
+  padding:8px 0; border-bottom:1px solid var(--linea);
+}
+.campo label{font:11.5px/1.6 var(--f-mono); color:var(--texto3)}
+.campo input, .campo select{
+  background:none; border:none; color:var(--texto); font:13.5px/1.6 var(--f-mono);
+  outline:none; padding:0; width:100%; min-width:0;
+}
+.campo input::placeholder, .campo textarea::placeholder{color:var(--texto3); opacity:1}
+.campo select{color:var(--texto); cursor:pointer}
+.campo:focus-within{border-bottom-color:var(--naranja)}
+.campo:focus-within label{color:var(--naranja)}
+.campo .conbtn{display:flex; align-items:baseline; gap:8px}
+.campo .conbtn input{flex:1}
+.hoy{border:none; color:var(--texto3); padding:1px 3px; font:11px/1.4 var(--f-mono); flex:none}
+.hoy:hover{color:var(--naranja); border-color:transparent}
+.campo.bloque{display:block}
+.campo.bloque label{display:block; margin-bottom:7px}
+.campo textarea{
+  width:100%; background:var(--negro); border:1px solid var(--linea2); color:var(--texto);
+  font:13px/1.65 var(--f-mono); padding:10px 11px; outline:none; resize:vertical; min-height:96px;
+}
+.campo textarea:focus{border-color:var(--naranja)}
+.grupo-campos[hidden]{display:none}
+
+/* ── hoja auxiliar ──────────────────────────────────────────────── */
+.velo.centro{align-items:center; justify-content:center; padding:20px}
+.hoja{
+  background:var(--panel); border:1px solid var(--linea2); border-top:3px solid var(--naranja);
+  width:min(430px,100%); padding:26px 28px;
+}
+.hoja h3{font:700 19px/1.2 var(--f-cond); text-transform:uppercase; margin-bottom:20px}
+.hoja dl{display:grid; grid-template-columns:auto 1fr; gap:10px 16px; align-items:center}
+.hoja dt{
+  font:12px/1 var(--f-mono); color:var(--naranja); border:1px solid var(--linea2);
+  padding:5px 8px; text-align:center;
+}
+.hoja dd{font:13px/1.5 var(--f-mono); color:var(--texto2)}
+.hoja p{font:13.5px/1.75 var(--f-prosa); color:var(--texto2); margin-bottom:14px}
+.hoja .fin{display:flex; justify-content:flex-end; margin-top:24px}
+
+/* ── conexión ───────────────────────────────────────────────────── */
+#conexion{
+  position:fixed; inset:0; background:var(--negro); z-index:50;
+  display:flex; align-items:center; padding:20px 20px 20px calc(var(--lomo) + 40px);
+}
+#conexion[hidden]{display:none}
+.tarjeta{max-width:520px}
+.tarjeta .cabecera{
+  font:700 46px/.9 var(--f-cond); font-stretch:75%; letter-spacing:.02em;
+  text-transform:uppercase; color:var(--naranja); margin-bottom:6px;
+}
+.tarjeta .lema{
+  font:11px/1.6 var(--f-mono); color:var(--texto3); letter-spacing:.12em;
+  text-transform:uppercase; margin-bottom:30px; padding-bottom:22px;
+  border-bottom:2px solid var(--linea2);
+}
+.tarjeta p{font:14px/1.8 var(--f-prosa); color:var(--texto2); margin-bottom:26px}
+.tarjeta p b{color:var(--texto)}
+.tarjeta .mini{font:12px/1.6 var(--f-mono); color:var(--texto3); margin:18px 0 0}
+.tarjeta input{
+  width:100%; background:var(--carbon); border:1px solid var(--linea2); color:var(--naranja);
+  padding:10px 12px; font:13px/1.5 var(--f-mono); margin:14px 0;
+}
+.tarjeta .saltar{
+  display:inline-block; margin-top:24px; font:12px/1.5 var(--f-mono); color:var(--texto3);
+  cursor:pointer; border-bottom:1px dotted var(--texto3);
+}
+.tarjeta .saltar:hover{color:var(--naranja); border-bottom-color:var(--naranja)}
+.tarjeta .pie-ver{margin-top:40px; font:10.5px/1 var(--f-mono); color:var(--texto3)}
+.botonera{display:flex; gap:10px; flex-wrap:wrap}
+
+/* ── aviso y nota ───────────────────────────────────────────────── */
+#aviso{
+  display:flex; gap:14px; align-items:center; justify-content:space-between;
+  border-left:5px solid var(--naranja); background:var(--carbon);
+  padding:12px 15px; margin:16px 0 0; font:12.5px/1.5 var(--f-mono); color:var(--texto);
+}
+#aviso[hidden]{display:none}
+#aviso .txt{flex:1}
+#aviso button{flex:none; border-color:var(--naranja2); color:var(--naranja); font-size:12px}
+#aviso button:hover{border-color:var(--naranja)}
+#nota{
+  position:fixed; left:calc(var(--lomo) + 26px); bottom:0; z-index:60;
+  background:var(--texto); color:var(--negro); padding:11px 14px;
+  font:12.5px/1.4 var(--f-mono); display:flex; align-items:center; gap:16px;
+  transform:translateY(101%); transition:transform .18s ease; pointer-events:none;
+}
+#nota.visible{transform:translateY(0); pointer-events:auto}
+#nota button{
+  border:1px solid var(--negro); color:var(--negro); padding:4px 9px;
+  font:700 10px/1.2 var(--f-cond); letter-spacing:.12em; text-transform:uppercase;
+}
+#nota button:hover{background:var(--negro); color:var(--texto)}
+#nota button[hidden]{display:none}
+
+/* ── pruebas ────────────────────────────────────────────────────── */
+#pruebas{padding:34px 0 34px 26px; font:13px/1.8 var(--f-mono)}
+#pruebas .ok{color:#4f9d63} #pruebas .mal{color:var(--rojo)}
+#pruebas h2{font:700 26px/1 var(--f-cond); text-transform:uppercase; margin-bottom:20px; color:var(--naranja)}
+
+/* ── pantallas estrechas ────────────────────────────────────────── */
+@media (max-width:900px){
+  :root{--lomo:30px}
+  #lomo .rotulo{display:none}
+  #lienzo{padding:0 16px 100px 18px}
+  .carrete{
+    grid-template-columns:1fr auto; gap:6px 14px; padding:14px 0 14px 16px;
+    align-items:start;
+  }
+  .carrete::before{left:-18px; width:6px}
+  .carrete:hover::before{left:-18px; width:10px}
+  .col-codigo{grid-column:1; grid-row:1}
+  .col-estado{grid-column:2; grid-row:1; text-align:right}
+  .col-peli{grid-column:1 / -1; grid-row:2}
+  .fechas{grid-column:1 / -1; grid-row:3}
+  .notas{grid-column:1 / -1; grid-row:4}
+  .grupo-cab h2{font-size:25px}
+  .campo{grid-template-columns:92px 1fr}
+  #conexion{padding-left:46px}
+  .tarjeta .cabecera{font-size:34px}
+  .etiqueta .flecha{opacity:.7; width:10px}
+}
+
+/* ── impresión: registro de laboratorio ─────────────────────────── */
+@media print{
+  #lomo, .cima, .camaras, .via, .mando, footer, #aviso, #nota, .estado-linea{display:none !important}
+  body{background:#fff; color:#000; padding:0; font-size:10.5px}
+  #lienzo{max-width:none; padding:0}
+  .grupo-cab{border-bottom-color:#000}
+  .grupo-cab h2{color:#000; font-size:20px}
+  .carrete{grid-template-columns:130px 1fr 92px 130px 1fr; padding:5px 0 5px 8px; break-inside:avoid}
+  .carrete::before{left:0; width:3px; background:#999 !important}
+  .etiqueta{background:none !important; color:#000 !important; border:1px solid #999; animation:none}
+  .codigo{color:#000; font-size:14px}
+  .notas, .fechas, .bajo-codigo, .receta{color:#444; -webkit-line-clamp:none}
+}
+</style>
+</head>
+<body>
+
+<div id="lomo"><h1 class="rotulo">Almendros <em id="lomo-lema"></em></h1></div>
+
+<div id="lienzo">
+
+  <div class="cima">
+    <label class="busca">
+      <span class="pre" id="pre-busca">buscar</span>
+      <input type="search" id="q" autocomplete="off">
+    </label>
+    <div class="cima-der">
+      <button class="desnudo" id="btn-menu" aria-haspopup="menu" aria-expanded="false" data-t="menu"></button>
+      <button class="primario" id="btn-nuevo" data-t="nuevo"></button>
+      <div id="menu" role="menu" hidden></div>
+    </div>
+  </div>
+
+  <div class="estado-linea" id="sumario"></div>
+  <div id="aviso" hidden><span class="txt"></span></div>
+
+  <nav class="camaras" id="f-camaras"></nav>
+  <nav class="via" id="f-estados"></nav>
+  <div class="mando">
+    <div class="vista" id="vista"></div>
+  </div>
+
+  <main id="lista"></main>
+
+  <div id="vacio" hidden>
+    <div class="cero">00</div>
+    <h3 id="vacio-tit"></h3>
+    <p id="vacio-txt"></p>
+  </div>
+
+  <footer>
+    <span id="pie-ver"></span>
+    <span id="pie-carpeta"></span>
+  </footer>
+</div>
+
+<div class="velo" id="velo">
+  <div class="ficha" role="dialog" aria-modal="true" aria-labelledby="ficha-tit">
+    <div class="ficha-cab">
+      <div class="fila1">
+        <h3 id="ficha-tit"></h3>
+        <span id="ficha-sello"></span>
+      </div>
+      <div class="sub" id="ficha-sub"></div>
+    </div>
+    <div class="ficha-cuerpo">
+
+      <div class="apartado"><span class="n">01</span><span data-t="apIdentidad"></span></div>
+      <div class="campo"><label for="m-codigo" data-t="lblCodigo"></label><input id="m-codigo" data-tp="phCodigo" autocomplete="off"></div>
+      <div class="campo"><label for="m-camara" data-t="lblCamara"></label><input id="m-camara" list="dl-camaras" data-tp="phCamara" autocomplete="off"></div>
+      <div class="campo"><label for="m-pelicula" data-t="lblPelicula"></label><input id="m-pelicula" list="dl-pelis" data-tp="phPelicula" autocomplete="off"></div>
+      <div class="campo"><label for="m-iso" data-t="lblIso"></label><input id="m-iso" data-tp="phIso" autocomplete="off"></div>
+      <div class="campo"><label for="m-formato" data-t="lblFormato"></label><input id="m-formato" list="dl-formatos" data-tp="phFormato" autocomplete="off"></div>
+      <div class="campo"><label for="m-exposiciones" data-t="lblExposiciones"></label><input id="m-exposiciones" data-tp="phExposiciones" autocomplete="off"></div>
+
+      <div class="apartado">
+        <span class="n">02</span><span data-t="apRevelado"></span>
+        <div class="flujo-sel" id="sel-flujo">
+          <button type="button" data-flujo="lab" data-t="flujoLab"></button>
+          <button type="button" data-flujo="casa" data-t="flujoCasa"></button>
+        </div>
+      </div>
+      <div class="campo"><label for="m-estado" data-t="lblEstado"></label><select id="m-estado"></select></div>
+      <div class="grupo-campos" id="g-lab">
+        <div class="campo"><label for="m-laboratorio" data-t="lblLaboratorio"></label><input id="m-laboratorio" list="dl-labs" data-tp="phLaboratorio" autocomplete="off"></div>
+        <div class="campo"><label for="m-pedido" data-t="lblPedido"></label><input id="m-pedido" data-tp="phPedido" autocomplete="off"></div>
+      </div>
+      <div class="grupo-campos" id="g-casa">
+        <div class="campo"><label for="m-revelador" data-t="lblRevelador"></label><input id="m-revelador" list="dl-reveladores" data-tp="phRevelador" autocomplete="off"></div>
+        <div class="campo"><label for="m-dilucion" data-t="lblDilucion"></label><input id="m-dilucion" data-tp="phDilucion" autocomplete="off"></div>
+        <div class="campo"><label for="m-tiempo" data-t="lblTiempo"></label><input id="m-tiempo" data-tp="phTiempo" autocomplete="off"></div>
+        <div class="campo"><label for="m-temperatura" data-t="lblTemperatura"></label><input id="m-temperatura" data-tp="phTemperatura" autocomplete="off"></div>
+      </div>
+
+      <div class="apartado"><span class="n">03</span><span data-t="apFechas"></span></div>
+      <div class="campo"><label for="m-carga" data-t="lblCarga"></label>
+        <div class="conbtn"><input id="m-carga" data-tp="phFecha" autocomplete="off"><button type="button" class="hoy" data-hoy="m-carga" data-t="hoy"></button></div></div>
+      <div class="campo"><label for="m-fin" data-t="lblFin"></label>
+        <div class="conbtn"><input id="m-fin" data-tp="phFecha" autocomplete="off"><button type="button" class="hoy" data-hoy="m-fin" data-t="hoy"></button></div></div>
+      <div class="campo"><label for="m-revelado" data-t="lblRevelado"></label>
+        <div class="conbtn"><input id="m-revelado" data-tp="phFecha" autocomplete="off"><button type="button" class="hoy" data-hoy="m-revelado" data-t="hoy"></button></div></div>
+
+      <div class="apartado"><span class="n">04</span><span data-t="apNotas"></span></div>
+      <div class="campo bloque"><label for="m-notas" data-t="apNotas"></label><textarea id="m-notas" data-tp="phNotas"></textarea></div>
+
+      <div class="apartado"><span class="n">05</span><span data-t="apArchivo"></span></div>
+      <div class="campo"><label for="m-archivo" data-t="lblArchivo"></label><input id="m-archivo" data-tp="phArchivo" autocomplete="off"></div>
+      <div class="campo"><label for="m-escaneos" data-t="lblEscaneos"></label><input id="m-escaneos" data-tp="phEscaneos" autocomplete="off"></div>
+    </div>
+    <div class="ficha-pie">
+      <button class="peligro" id="btn-borrar" data-t="eliminar"></button>
+      <div class="der">
+        <button id="btn-cancelar" data-t="cancelar"></button>
+        <button class="primario" id="btn-guardar" data-t="guardar"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="velo centro" id="velo-hoja">
+  <div class="hoja" role="dialog" aria-modal="true" aria-labelledby="hoja-tit">
+    <h3 id="hoja-tit"></h3>
+    <div id="hoja-cuerpo"></div>
+    <div class="fin"><button id="hoja-cerrar" data-t="cerrar"></button></div>
+  </div>
+</div>
+
+<div id="conexion" hidden>
+  <div class="tarjeta">
+    <div class="cabecera">Almendros</div>
+    <div class="lema" id="con-lema"></div>
+    <p id="con-texto"></p>
+    <div class="botonera" id="con-botones"></div>
+    <p class="mini" id="con-mini"></p>
+    <span class="saltar" id="con-saltar" role="button" tabindex="0"></span>
+    <div class="pie-ver" id="con-ver"></div>
+  </div>
+</div>
+
+<datalist id="dl-camaras"></datalist>
+<datalist id="dl-pelis"></datalist>
+<datalist id="dl-labs"></datalist>
+<datalist id="dl-reveladores"></datalist>
+<datalist id="dl-formatos">
+  <option value="35mm"><option value="120"><option value="220"><option value="110">
+  <option value="127"><option value="126"><option value="4×5"><option value="5×7"><option value="8×10">
+</datalist>
+<input type="file" id="entrada-archivo" accept=".json,application/json" hidden>
+<div id="nota"><span class="txt"></span><button hidden></button></div>
+
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════════════════
+   ALMENDROS · v1.0.0
+   Cuaderno de carretes para fotografía analógica.
+
+   Decisiones de fondo:
+   · Un solo archivo, sin dependencias: debe abrirse desde file:// sin internet.
+   · Los datos son del usuario: un JSON legible en la carpeta que él elija.
+   · Las claves internas (estados, campos) van en español — idioma fundacional
+     del proyecto. La interfaz las traduce; el archivo nunca cambia de idioma.
+   · Las fechas son texto libre a propósito: «22/06/26», «julio», «¿antes del
+     viaje?». Un cuaderno acepta cómo recuerdas de verdad.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const VERSION = '1.0.0';
+const CLAVE = 'almendros-db-v2';
+const SUCIO = 'almendros-sucio';
+const CLAVE_VIEJA = 'almendros-db-v1';
+
+/* Nombres de archivo. Si la carpeta ya trae la estructura del proyecto
+   original (NEGATIVOS), se respeta y se sigue escribiendo ahí. */
+const ARCHIVO = 'almendros.json';
+const COPIAS = 'copias';
+const LEGADO_DIR = '_bbdd', LEGADO_ARCHIVO = 'negativos.json', LEGADO_COPIAS = '_backups';
+
+const ESTADOS = ['Cargado','Revelar','Revelando','Revelado','Recogido','Escaneado','Archivado'];
+const FLUJOS = {
+  lab:  ['Cargado','Revelar','Revelando','Revelado','Recogido','Escaneado','Archivado'],
+  casa: ['Cargado','Revelar','Revelando','Revelado','Escaneado','Archivado']
+};
+const LATEN = ['Revelando','Revelado'];          // estados que respiran: el laboratorio trabaja
+const DIAS_PAPELERA = 180;
+
+/* ── idiomas ─────────────────────────────────────────────────────── */
+const TXT = {
+ es: {
+  nuevo:'+ Carrete', menu:'menú', buscar:'película, lugar, revelador, nota…', preBusca:'buscar',
+  lema:'Registro de carretes', tituloDoc:'Almendros · registro de carretes',
+  navCamaras:'Filtrar por cámara', navEstados:'Filtrar por estado',
+  todas:'todas', todos:'todos', porCamara:'por cámara', porEstado:'por estado',
+  estados:{Cargado:'Cargado',Revelar:'Revelar',Revelando:'Revelando',Revelado:'Revelado',Recogido:'Recogido',Escaneado:'Escaneado',Archivado:'Archivado'},
+  nCarretes:n=>`${n} ${n===1?'carrete':'carretes'}`,
+  pedidoN:n=>`pedido ${n}`, revFecha:f=>`rev. ${f}`,
+  guardadoOk:'guardado ✓', guardando:'guardando…', sinGuardar:'sin guardar', errGuardar:'⚠ sin guardar',
+  soloAqui:'solo en este navegador',
+  avisoOffline:'Los cambios no se están guardando en tu carpeta.',
+  avisoErr:'No se ha podido escribir el último cambio. Nada se ha perdido.',
+  avisoVieja:'Hay una versión más nueva de Almendros abierta en otro sitio. Recarga esta pestaña antes de seguir editando.',
+  avisoCopia:'Llevas muchos cambios guardados solo en este navegador. Descarga una copia por si acaso.',
+  avisoDemo:'Modo demostración: estos carretes son de ejemplo y no se guarda nada.',
+  reconectar:'Conectar', reintentar:'Reintentar', recargar:'Recargar', descargar:'Descargar copia',
+  apIdentidad:'el carrete', apRevelado:'revelado', apFechas:'fechas', apNotas:'notas', apArchivo:'dónde está',
+  lblCodigo:'código', lblCamara:'cámara', lblPelicula:'película', lblIso:'forzado',
+  lblFormato:'formato', lblExposiciones:'exposiciones', lblEstado:'estado',
+  lblLaboratorio:'laboratorio', lblPedido:'nº pedido',
+  lblRevelador:'revelador', lblDilucion:'dilución', lblTiempo:'tiempo', lblTemperatura:'temperatura',
+  lblCarga:'cargado el', lblFin:'terminado el', lblRevelado:'revelado el',
+  lblArchivo:'archivo', lblEscaneos:'escaneos',
+  flujoLab:'Laboratorio', flujoCasa:'En casa',
+  phCodigo:'Yashica10', phCamara:'Yashica', phPelicula:'Kodak 400 TX', phIso:'forzado a 800',
+  phFormato:'35mm', phExposiciones:'36', phLaboratorio:'tu laboratorio', phPedido:'4821',
+  phRevelador:'HC-110', phDilucion:'1+31', phTiempo:'6:30', phTemperatura:'20 °C',
+  phFecha:'22/06/26 · julio · ¿antes del viaje?', phNotas:'Dónde, con quién, luz, aperturas…',
+  phArchivo:'Archivador 2 · funda 14', phEscaneos:'Carpeta o enlace a los escaneos',
+  hoy:'hoy', nuevoCarrete:'Nuevo carrete', eliminar:'Eliminar', cancelar:'Cancelar', guardar:'Guardar', cerrar:'Cerrar',
+  faltaCodigo:'Ponle un código al carrete', hechoGuardado:'Guardado', hechoEliminado:'Eliminado', deshacer:'Deshacer',
+  avanzado:(c,e)=>`${c}: ${e.toLowerCase()}`, pasarA:e=>`Pasar a ${e.toLowerCase()}`,
+  camAnadida:n=>`Cámara ${n} añadida`, camQuitada:n=>`Cámara ${n} quitada`, camYaEsta:'Esa cámara ya está',
+  nuevaCamara:'nombre de la cámara', anadirCamara:'+ cámara', quitarCamara:'Quitar esta cámara',
+  mCarpeta:'carpeta', mDatos:'tus datos',
+  mCambiarCarpeta:'Cambiar de carpeta…', mConectar:'Conectar con una carpeta…',
+  mCopia:'Descargar una copia (.json)', mAbrir:'Abrir un archivo…', mCsv:'Exportar a hoja de cálculo (.csv)',
+  mImprimir:'Imprimir el registro', mAtajos:'Atajos de teclado', mAcerca:'Acerca de Almendros',
+  temaOscuro:'Oscuro', temaClaro:'Claro',
+  atajos:'Atajos', atajoNuevo:'Carrete nuevo', atajoBuscar:'Buscar', atajoCerrar:'Cerrar / limpiar', atajoGuardar:'Guardar la ficha',
+  acerca:'Acerca de',
+  acercaTxt:'Un cuaderno para los carretes que pasan por tus cámaras: qué película, cuándo la cargaste, dónde está ahora, cómo la revelaste.<br><br>Todo vive en un único archivo dentro de tu carpeta. Sin cuentas, sin servidores, sin cuotas. Nada sale de tu ordenador.',
+  copiaHecha:'Copia descargada', csvHecho:'Hoja de cálculo descargada',
+  importado:(a,m)=>[a?`${a} ${a===1?'carrete añadido':'carretes añadidos'}`:'',
+                    m?`${m} ${m===1?'actualizado':'actualizados'}`:''].filter(Boolean).join(' · ') || 'Ya lo tenías todo',
+  importadoNada:'Ese archivo no traía carretes',
+  importError:'No he podido leer ese archivo',
+  conPrimera:'Elige una única vez la carpeta donde vivirán tus carretes. Vale una carpeta nueva y vacía, una del NAS o una que ya sincronices.',
+  conRepite:'Confirma el acceso a tu carpeta para seguir guardando donde siempre.',
+  conElegir:'Elegir la carpeta', conContinuar:'Continuar',
+  conMini:'Si el navegador pregunta, elige «Permitir siempre».',
+  conSaltar:'seguir sin guardar por ahora', conAqui:'Empezar en este navegador',
+  sinFSAtit:'Este navegador no puede escribir en carpetas',
+  sinFSA:'Puedes usar Almendros igualmente: todo se guarda dentro de este navegador y descargas una copia cuando quieras. Para guardar directamente en una carpeta —lo recomendable— ábrelo en un ordenador con Chrome, Edge o Brave.',
+  brave:'Brave trae apagado el permiso para que una página guarde en tu carpeta. Actívalo así:'
+      + '<br><br>1 · Copia esta dirección y pégala en la barra de Brave:'
+      + '<input id="con-dir" readonly value="__DIR__" onclick="this.select()" aria-label="Dirección del ajuste de Brave">'
+      + '2 · En la opción resaltada elige <b>Enabled</b> y pulsa <b>Relaunch</b>.'
+      + '<br>3 · Vuelve a abrir esta página: quedará puesto para siempre.',
+  braveCopiar:'Copiar la dirección', braveCopiada:'Copiada — pégala en la barra de Brave',
+  bienvenidaTit:'Sin carretes todavía', bienvenida:'Añade el primero y empieza el registro. Cada carrete lleva su cámara, su película y su viaje hasta el escáner.',
+  sinResultadosTit:'Nada por aquí', sinResultados:'Ningún carrete encaja con este filtro.',
+  camaraVaciaTit:'Cámara sin estrenar', camaraVacia:n=>`${n} todavía no tiene ningún carrete.`,
+  csv:{codigo:'Código',camara:'Cámara',pelicula:'Película',iso:'Forzado/ISO',formato:'Formato',exposiciones:'Exposiciones',
+    estado:'Estado',flujo:'Revelado',laboratorio:'Laboratorio',pedido:'Nº pedido',revelador:'Revelador',dilucion:'Dilución',
+    tiempo:'Tiempo',temperatura:'Temperatura',carga:'Cargado el',fin:'Terminado el',revelado:'Revelado el',
+    archivo:'Archivo físico',escaneos:'Escaneos',notas:'Notas'}
+ },
+ en: {
+  nuevo:'+ Roll', menu:'menu', buscar:'film, place, developer, note…', preBusca:'search',
+  lema:'Film log', tituloDoc:'Almendros · film logbook',
+  navCamaras:'Filter by camera', navEstados:'Filter by status',
+  todas:'all', todos:'all', porCamara:'by camera', porEstado:'by status',
+  estados:{Cargado:'Loaded',Revelar:'To develop',Revelando:'Developing',Revelado:'Developed',Recogido:'Picked up',Escaneado:'Scanned',Archivado:'Filed'},
+  nCarretes:n=>`${n} ${n===1?'roll':'rolls'}`,
+  pedidoN:n=>`order ${n}`, revFecha:f=>`dev. ${f}`,
+  guardadoOk:'saved ✓', guardando:'saving…', sinGuardar:'not saving', errGuardar:'⚠ not saved',
+  soloAqui:'in this browser only',
+  avisoOffline:'Changes are not being saved to your folder.',
+  avisoErr:'The last change could not be written. Nothing was lost.',
+  avisoVieja:'A newer version of Almendros is open elsewhere. Reload this tab before editing further.',
+  avisoCopia:'You have a lot of changes saved only in this browser. Download a copy, just in case.',
+  avisoDemo:'Demo mode: these rolls are samples and nothing is saved.',
+  reconectar:'Connect', reintentar:'Retry', recargar:'Reload', descargar:'Download a copy',
+  apIdentidad:'the roll', apRevelado:'developing', apFechas:'dates', apNotas:'notes', apArchivo:'where it lives',
+  lblCodigo:'code', lblCamara:'camera', lblPelicula:'film', lblIso:'push/pull',
+  lblFormato:'format', lblExposiciones:'exposures', lblEstado:'status',
+  lblLaboratorio:'lab', lblPedido:'order no.',
+  lblRevelador:'developer', lblDilucion:'dilution', lblTiempo:'time', lblTemperatura:'temperature',
+  lblCarga:'loaded on', lblFin:'finished on', lblRevelado:'developed on',
+  lblArchivo:'storage', lblEscaneos:'scans',
+  flujoLab:'Lab', flujoCasa:'At home',
+  phCodigo:'Yashica10', phCamara:'Yashica', phPelicula:'Kodak Tri-X 400', phIso:'pushed to 800',
+  phFormato:'35mm', phExposiciones:'36', phLaboratorio:'your lab', phPedido:'4821',
+  phRevelador:'HC-110', phDilucion:'1+31', phTiempo:'6:30', phTemperatura:'20 °C',
+  phFecha:'22/06/26 · july · before the trip?', phNotas:'Where, with whom, light, apertures…',
+  phArchivo:'Binder 2 · sleeve 14', phEscaneos:'Folder or link to the scans',
+  hoy:'today', nuevoCarrete:'New roll', eliminar:'Delete', cancelar:'Cancel', guardar:'Save', cerrar:'Close',
+  faltaCodigo:'Give the roll a code', hechoGuardado:'Saved', hechoEliminado:'Deleted', deshacer:'Undo',
+  avanzado:(c,e)=>`${c}: ${e.toLowerCase()}`, pasarA:e=>`Move to ${e.toLowerCase()}`,
+  camAnadida:n=>`Camera ${n} added`, camQuitada:n=>`Camera ${n} removed`, camYaEsta:'That camera is already there',
+  nuevaCamara:'camera name', anadirCamara:'+ camera', quitarCamara:'Remove this camera',
+  mCarpeta:'folder', mDatos:'your data',
+  mCambiarCarpeta:'Change folder…', mConectar:'Connect to a folder…',
+  mCopia:'Download a copy (.json)', mAbrir:'Open a file…', mCsv:'Export to spreadsheet (.csv)',
+  mImprimir:'Print the log', mAtajos:'Keyboard shortcuts', mAcerca:'About Almendros',
+  temaOscuro:'Dark', temaClaro:'Light',
+  atajos:'Shortcuts', atajoNuevo:'New roll', atajoBuscar:'Search', atajoCerrar:'Close / clear', atajoGuardar:'Save the card',
+  acerca:'About',
+  acercaTxt:'A logbook for the rolls that pass through your cameras: which film, when you loaded it, where it is now, how you developed it.<br><br>Everything lives in a single file inside your folder. No accounts, no servers, no subscriptions. Nothing leaves your computer.',
+  copiaHecha:'Copy downloaded', csvHecho:'Spreadsheet downloaded',
+  importado:(a,m)=>[a?`${a} ${a===1?'roll added':'rolls added'}`:'',
+                    m?`${m} updated`:''].filter(Boolean).join(' · ') || 'You already had it all',
+  importadoNada:'That file had no rolls in it',
+  importError:'I could not read that file',
+  conPrimera:'Choose — just once — the folder where your rolls will live. A new empty folder works, so does one on your NAS or a synced folder.',
+  conRepite:'Confirm access to your folder to keep saving where you always do.',
+  conElegir:'Choose the folder', conContinuar:'Continue',
+  conMini:'If the browser asks, choose “Allow on every visit”.',
+  conSaltar:'continue without saving for now', conAqui:'Start in this browser',
+  sinFSAtit:'This browser cannot write to folders',
+  sinFSA:'You can still use Almendros: everything is kept inside this browser and you download a copy whenever you like. To save straight into a folder — the better way — open it on a computer with Chrome, Edge or Brave.',
+  brave:'Brave ships with folder saving turned off for web pages. Turn it on like this:'
+      + '<br><br>1 · Copy this address and paste it into Brave’s address bar:'
+      + '<input id="con-dir" readonly value="__DIR__" onclick="this.select()" aria-label="Brave setting address">'
+      + '2 · Set the highlighted option to <b>Enabled</b> and hit <b>Relaunch</b>.'
+      + '<br>3 · Open this page again: it will stick forever.',
+  braveCopiar:'Copy the address', braveCopiada:'Copied — paste it into Brave’s address bar',
+  bienvenidaTit:'No rolls yet', bienvenida:'Add the first one and start the log. Each roll carries its camera, its film and its journey to the scanner.',
+  sinResultadosTit:'Nothing here', sinResultados:'No roll matches this filter.',
+  camaraVaciaTit:'Unused camera', camaraVacia:n=>`${n} has no rolls yet.`,
+  csv:{codigo:'Code',camara:'Camera',pelicula:'Film',iso:'Push/ISO',formato:'Format',exposiciones:'Exposures',
+    estado:'Status',flujo:'Developing',laboratorio:'Lab',pedido:'Order no.',revelador:'Developer',dilucion:'Dilution',
+    tiempo:'Time',temperatura:'Temperature',carga:'Loaded on',fin:'Finished on',revelado:'Developed on',
+    archivo:'Physical storage',escaneos:'Scans',notas:'Notes'}
+ }
+};
+let lang = localStorage.getItem('almendros-lang')
+        || ((navigator.language||'').toLowerCase().startsWith('es') ? 'es' : 'en');
+const t = (k,...a)=>{ const v = TXT[lang][k]; return typeof v==='function' ? v(...a) : v; };
+
+/* ── estado en memoria ───────────────────────────────────────────── */
+const CAMPOS = ['codigo','camara','pelicula','iso','formato','exposiciones','estado','flujo',
+  'laboratorio','pedido','revelador','dilucion','tiempo','temperatura',
+  'carga','fin','revelado','archivo','escaneos','notas'];
+
+let est = vacio();
+let filtro = {q:'', estado:'', camara:''};
+let vista = localStorage.getItem('almendros-vista') || 'camara';
+let conectado = false, carpeta = null, modoLegado = false, demo = false;
+let editId = null, temporizador = null, escrituraPendiente = false;
+let ultimoIndicador = 'offline', canal = null;
+const soportaFSA = 'showDirectoryPicker' in window;
+
+const $ = id => document.getElementById(id);
+const ahora = ()=> new Date().toISOString();
+const uid = ()=> 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const esc = s => (s??'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function vacio(){ return {camaras:[], camarasMod:{}, carretes:[], papelera:[], ajustes:{flujo:'lab'}, actualizado:''}; }
+function instantanea(){
+  return {app:'almendros', version:2, porVersion:VERSION, actualizado:est.actualizado || ahora(),
+    ajustes:est.ajustes, camaras:est.camaras, camarasMod:est.camarasMod,
+    carretes:est.carretes, papelera:est.papelera};
+}
+
+/* ── normalización: acepta los tres formatos que han existido ────── */
+function normaliza(d){
+  if(!d) return vacio();
+  const esArray = Array.isArray(d);
+  const carretes = esArray ? d : (Array.isArray(d.carretes) ? d.carretes : []);
+  const sello = (!esArray && d.actualizado) || ahora();
+  const out = vacio();
+  out.actualizado = sello;
+  out.ajustes = Object.assign({flujo:'lab'}, (!esArray && d.ajustes) || {});
+  out.carretes = carretes.filter(r=>r && typeof r==='object').map(r=>{
+    const n = {id: r.id || uid(), mod: r.mod || sello};
+    CAMPOS.forEach(c=> n[c] = typeof r[c]==='string' ? r[c] : (r[c]==null ? '' : String(r[c])));
+    if(n.estado === 'Terminado') n.estado = 'Revelar';          // nombre viejo del estado
+    if(!ESTADOS.includes(n.estado)) n.estado = 'Cargado';
+    if(n.flujo !== 'casa' && n.flujo !== 'lab') n.flujo = (n.revelador || n.dilucion) ? 'casa' : 'lab';
+    if(n.flujo === 'casa' && n.estado === 'Recogido') n.estado = 'Revelado';
+    return n;
+  });
+  out.papelera = (!esArray && Array.isArray(d.papelera) ? d.papelera : [])
+    .filter(p=>p && p.k && p.mod);
+  out.camarasMod = Object.assign({}, (!esArray && d.camarasMod) || {});
+  const nombres = new Set(((!esArray && Array.isArray(d.camaras)) ? d.camaras : [])
+    .filter(c=>typeof c==='string' && c.trim()).map(c=>c.trim()));
+  out.carretes.forEach(r=>{ if(r.camara) nombres.add(r.camara); });
+  out.camaras = [...nombres].sort(ordenTexto);
+  out.camaras.forEach(c=>{ if(!out.camarasMod[c]) out.camarasMod[c] = sello; });
+  return out;
+}
+const ordenTexto = (a,b)=> a.localeCompare(b,'es',{sensitivity:'base'});
+function adopta(d){ est = d; }
+
+/* ── fusión: dos copias del archivo, sin perder nada ─────────────
+   Cada carrete lleva su fecha de modificación y cada borrado deja
+   una marca en la papelera. Así dos ordenadores pueden tocar la
+   misma carpeta sin que el último en guardar borre lo del otro. */
+function fusiona(a, b){
+  if(!a) return b || vacio();
+  if(!b) return a;
+  const out = vacio();
+  const pap = new Map();
+  [...(a.papelera||[]), ...(b.papelera||[])].forEach(p=>{
+    const prev = pap.get(p.k);
+    if(!prev || p.mod > prev.mod) pap.set(p.k, p);
+  });
+  const car = new Map();
+  [...(a.carretes||[]), ...(b.carretes||[])].forEach(r=>{
+    const prev = car.get(r.id);
+    if(!prev || (r.mod||'') >= (prev.mod||'')) car.set(r.id, r);
+  });
+  for(const [id, r] of [...car]){
+    const marca = pap.get(id);
+    if(marca && marca.mod > (r.mod||'')) car.delete(id);
+  }
+  out.carretes = [...car.values()];
+
+  const cmod = Object.assign({}, a.camarasMod||{});
+  Object.entries(b.camarasMod||{}).forEach(([n,m])=>{ if(!cmod[n] || m > cmod[n]) cmod[n] = m; });
+  const nombres = new Set([...(a.camaras||[]), ...(b.camaras||[])]);
+  const vivas = [...nombres].filter(n=>{
+    const marca = pap.get('cam:'+n);
+    return !(marca && marca.mod > (cmod[n]||''));
+  });
+  out.carretes.forEach(r=>{ if(r.camara && !vivas.includes(r.camara)) vivas.push(r.camara); });
+  out.camaras = vivas.sort(ordenTexto);
+  out.camarasMod = cmod;
+
+  const limite = new Date(Date.now() - DIAS_PAPELERA*864e5).toISOString();
+  out.papelera = [...pap.values()].filter(p=>p.mod > limite);
+
+  const aNuevo = (a.actualizado||'') >= (b.actualizado||'');
+  out.ajustes = Object.assign({flujo:'lab'}, (aNuevo ? a.ajustes : b.ajustes) || {});
+  out.actualizado = aNuevo ? (a.actualizado||'') : (b.actualizado||'');
+  return out;
+}
+
+/* ── caché local ─────────────────────────────────────────────────── */
+function leeLocal(){
+  for(const clave of [CLAVE, CLAVE_VIEJA]){
+    try{
+      const crudo = localStorage.getItem(clave);
+      if(crudo){
+        const d = normaliza(JSON.parse(crudo));
+        if(d.carretes.length || d.camaras.length) return d;
+      }
+    }catch(e){}
+  }
+  return null;
+}
+
+/* ── memoria de la carpeta elegida ───────────────────────────────── */
+function kv(modo, clave, valor){
+  return new Promise((res, rej)=>{
+    const abre = indexedDB.open('almendros-kv', 1);
+    abre.onupgradeneeded = ()=>abre.result.createObjectStore('kv');
+    abre.onerror = ()=>rej(abre.error);
+    abre.onsuccess = ()=>{
+      const tx = abre.result.transaction('kv', modo==='get'?'readonly':'readwrite');
+      const st = tx.objectStore('kv');
+      const req = modo==='get' ? st.get(clave) : st.put(valor, clave);
+      req.onsuccess = ()=>res(req.result);
+      req.onerror = ()=>rej(req.error);
+    };
+  });
+}
+
+/* ── carpeta: leer y escribir ────────────────────────────────────── */
+async function existe(dir, nombre, esDir){
+  try{ esDir ? await dir.getDirectoryHandle(nombre) : await dir.getFileHandle(nombre); return true; }
+  catch(e){ return false; }
+}
+async function detectaLegado(dir){
+  if(await existe(dir, ARCHIVO)) return false;
+  if(await existe(dir, LEGADO_DIR, true)){
+    const bb = await dir.getDirectoryHandle(LEGADO_DIR);
+    if(await existe(bb, LEGADO_ARCHIVO)) return true;
+  }
+  return false;
+}
+async function conectar(conGesto){
+  if(!soportaFSA) return false;
+  try{
+    if(!carpeta) carpeta = (await kv('get','carpeta')) || null;
+    if(carpeta){
+      let p = await carpeta.queryPermission({mode:'readwrite'});
+      if(p === 'prompt' && conGesto) p = await carpeta.requestPermission({mode:'readwrite'});
+      if(p === 'granted'){ modoLegado = await detectaLegado(carpeta); return true; }
+      if(!conGesto) return false;
+    }
+    if(!conGesto) return false;
+    const elegida = await window.showDirectoryPicker({id:'almendros', mode:'readwrite'});
+    carpeta = elegida;
+    modoLegado = await detectaLegado(elegida);
+    await kv('put','carpeta', elegida);
+    return true;
+  }catch(e){ return false; }
+}
+async function manejaArchivo(crear){
+  if(modoLegado){
+    const bb = await carpeta.getDirectoryHandle(LEGADO_DIR, {create:crear});
+    return bb.getFileHandle(LEGADO_ARCHIVO, {create:crear});
+  }
+  return carpeta.getFileHandle(ARCHIVO, {create:crear});
+}
+async function leeArchivo(){
+  const fh = await manejaArchivo(false);
+  const texto = await (await fh.getFile()).text();
+  const d = JSON.parse(texto);
+  if(!Array.isArray(d) && !(d && Array.isArray(d.carretes))) return null;
+  const n = normaliza(d);
+  n.porVersion = (!Array.isArray(d) && d.porVersion) || '';
+  return n;
+}
+async function escribeArchivo(){
+  let remoto = null;
+  try{ remoto = await leeArchivo(); }catch(e){}
+  const combinado = remoto ? fusiona(instantanea(), remoto) : instantanea();
+  await copiaDiaria();
+  const fh = await manejaArchivo(true);
+  const w = await fh.createWritable();           // escribe aparte y reemplaza al cerrar
+  await w.write(JSON.stringify(instantaneaDe(combinado), null, 1));
+  await w.close();
+  if(remoto && !fichaAbierta()){                 // adoptar lo fusionado si no estorba
+    const antes = JSON.stringify(est.carretes) + JSON.stringify(est.camaras);
+    adopta(combinado);
+    if(antes !== JSON.stringify(est.carretes) + JSON.stringify(est.camaras)) pinta();
+  }
+  if(canal) try{ canal.postMessage({tipo:'guardado', version:VERSION}); }catch(e){}
+}
+function instantaneaDe(d){
+  return {app:'almendros', version:2, porVersion:VERSION, actualizado:d.actualizado || ahora(),
+    ajustes:d.ajustes, camaras:d.camaras, camarasMod:d.camarasMod,
+    carretes:d.carretes, papelera:d.papelera};
+}
+async function copiaDiaria(){
+  // la primera vez que se guarda cada día, aparta el estado anterior (30 copias)
+  try{
+    const nombre = 'almendros-' + new Date().toISOString().slice(0,10) + '.json';
+    const viejo  = 'negativos-' + new Date().toISOString().slice(0,10) + '.json';
+    const dir = await carpeta.getDirectoryHandle(modoLegado ? LEGADO_COPIAS : COPIAS, {create:true});
+    const cual = modoLegado ? viejo : nombre;
+    if(await existe(dir, cual)) return;
+    let previo;
+    try{ previo = await (await (await manejaArchivo(false)).getFile()).text(); }catch(e){ return; }
+    const fh = await dir.getFileHandle(cual, {create:true});
+    const w = await fh.createWritable(); await w.write(previo); await w.close();
+    const nombres = [];
+    for await (const n of dir.keys())
+      if(/^(almendros|negativos)-\d{4}-\d{2}-\d{2}\.json$/.test(n)) nombres.push(n);
+    nombres.sort();
+    for(const v of nombres.slice(0,-30)) await dir.removeEntry(v);
+  }catch(e){}
+}
+
+/* ── guardado ────────────────────────────────────────────────────── */
+let avisoFijo = false;
+function indicador(estado){
+  ultimoIndicador = estado;
+  pintaSumario();
+  const mapa = {
+    offline: [t('avisoOffline'), conectado ? null : {txt:t('reconectar'), fn:async()=>{ if(await conectar(true)) await enMarcha(); }}],
+    err:     [t('avisoErr'), {txt:t('reintentar'), fn:()=>persiste()}],
+    local:   [null, null], ok:[null,null], saving:[null,null]
+  };
+  const [texto, accion] = mapa[estado] || [null,null];
+  if(texto) muestraAviso(texto, accion); else ocultaAviso();
+}
+function muestraAviso(texto, accion, fijo){
+  const el = $('aviso');
+  el.querySelector('.txt').textContent = texto;
+  const b = el.querySelector('button');
+  if(b) b.remove();
+  if(accion){
+    const btn = document.createElement('button');
+    btn.textContent = accion.txt;
+    btn.onclick = accion.fn;
+    el.appendChild(btn);
+  }
+  avisoFijo = !!fijo;
+  el.hidden = false;
+}
+function ocultaAviso(){ if(!avisoFijo) $('aviso').hidden = true; }
+
+function persiste(){
+  if(demo){ pinta(); return; }
+  est.actualizado = ahora();
+  try{ localStorage.setItem(CLAVE, JSON.stringify(instantanea())); }catch(e){}
+  if(!conectado){
+    localStorage.setItem(SUCIO, '1');
+    indicador(soportaFSA ? 'offline' : 'local');
+    if(!soportaFSA) cuentaCambioLocal();
+    return;
+  }
+  escrituraPendiente = true;
+  indicador('saving');
+  clearTimeout(temporizador);
+  temporizador = setTimeout(async ()=>{
+    const yo = temporizador;      // si entra otro cambio mientras escribimos, sigue pendiente
+    try{
+      await escribeArchivo();
+      // si entró otro cambio mientras escribíamos, sigue habiendo algo por volcar:
+      // ni se limpia la bandera ni se canta «guardado».
+      if(temporizador === yo){
+        escrituraPendiente = false;
+        localStorage.removeItem(SUCIO);
+      }
+      indicador('ok');
+    }catch(e){
+      localStorage.setItem(SUCIO, '1');
+      indicador('err');
+    }
+  }, 250);
+}
+function guarda(msg, accionDeshacer){
+  persiste(); pinta();
+  if(msg) avisa(msg, accionDeshacer);
+}
+function cuentaCambioLocal(){
+  const n = (+localStorage.getItem('almendros-sincopia') || 0) + 1;
+  localStorage.setItem('almendros-sincopia', n);
+  if(n > 25 && !avisoFijo) muestraAviso(t('avisoCopia'), {txt:t('descargar'), fn:descargaCopia}, true);
+}
+
+/* ── nota con deshacer ───────────────────────────────────────────── */
+function avisa(msg, accion){
+  const el = $('nota'), btn = el.querySelector('button');
+  el.querySelector('.txt').textContent = msg;
+  clearTimeout(el._h);
+  if(accion){
+    btn.hidden = false;
+    btn.textContent = t('deshacer');
+    btn.onclick = ()=>{ el.classList.remove('visible'); accion(); };
+  }else{ btn.hidden = true; }
+  el.classList.add('visible');
+  el._h = setTimeout(()=>el.classList.remove('visible'), accion ? 7000 : 2200);
+}
+
+/* ── utilidades de datos ─────────────────────────────────────────── */
+function estadosDe(r){
+  const lista = FLUJOS[r.flujo] || FLUJOS.lab;
+  return lista.includes(r.estado) ? lista : [r.estado, ...lista];
+}
+function siguienteEstado(r){
+  const lista = estadosDe(r);
+  const i = lista.indexOf(r.estado);
+  return (i >= 0 && i < lista.length-1) ? lista[i+1] : null;
+}
+function siguienteCodigo(camara){
+  const suyos = est.carretes.filter(r=>r.camara === camara).map(r=>r.codigo).filter(Boolean).sort(
+    (a,b)=>a.localeCompare(b,'es',{numeric:true}));
+  const ultimo = suyos[suyos.length-1];
+  if(!ultimo) return camara ? camara + '01' : '';
+  const m = ultimo.match(/^(.*?)(\d+)$/);
+  if(!m) return '';
+  return m[1] + String(+m[2] + 1).padStart(m[2].length, '0');
+}
+function marcaCarrete(r){ r.mod = ahora(); return r; }
+function entierra(clave){
+  est.papelera = est.papelera.filter(p=>p.k !== clave);
+  est.papelera.push({k:clave, mod:ahora()});
+}
+function desentierra(clave){ est.papelera = est.papelera.filter(p=>p.k !== clave); }
+
+/* ── pintado ─────────────────────────────────────────────────────── */
+function pintaSumario(){
+  const partes = [];
+  if(demo){
+    partes.push('<span class="est-aviso">demo</span>');
+  }else{
+    const clase = {ok:'est-ok', saving:'est-guardando', offline:'est-aviso', err:'est-aviso', local:'est-guardando'}[ultimoIndicador];
+    const txt = {ok:t('guardadoOk'), saving:t('guardando'), offline:t('sinGuardar'), err:t('errGuardar'), local:t('soloAqui')}[ultimoIndicador];
+    partes.push(`<span class="${clase}">${esc(txt)}</span>`);
+  }
+  if(conectado && carpeta) partes.push(esc(carpeta.name) + '/');
+  $('sumario').innerHTML = partes.join('');
+}
+
+function pinta(){
+  // ── cámaras: índice separado por barras ──
+  const fc = $('f-camaras');
+  const trozos = [`<button data-cam="" class="${filtro.camara===''?'on':''}">${esc(t('todas'))}</button>`];
+  est.camaras.forEach(c=>{
+    const usada = est.carretes.some(r=>r.camara===c);
+    trozos.push(`<button data-cam="${esc(c)}" class="${filtro.camara===c?'on':''}">${esc(c)}` +
+      (usada ? '' : `<span class="quita" role="button" tabindex="0" title="${esc(t('quitarCamara'))}">×</span>`) + '</button>');
+  });
+  fc.innerHTML = trozos.join('<span class="barra">/</span>') +
+    `<button class="anadir" id="cam-add">${esc(t('anadirCamara'))}</button>`;
+  fc.querySelectorAll('button[data-cam]').forEach(b=>{
+    b.onclick = ()=>{ filtro.camara = b.dataset.cam; pinta(); };
+    const x = b.querySelector('.quita');
+    if(x){
+      const quitar = e=>{ e.stopPropagation(); quitaCamara(b.dataset.cam); };
+      x.onclick = quitar;
+      x.onkeydown = e=>{ if(e.key==='Enter' || e.key===' ') quitar(e); };
+    }
+  });
+  $('cam-add').onclick = abreNuevaCamara;
+
+  // ── la vía: leyenda + filtro + recuento por fase ──
+  const usados = new Set(est.carretes.map(r=>r.estado));
+  (FLUJOS[est.ajustes.flujo] || FLUJOS.lab).forEach(e=>usados.add(e));
+  const visibles = ESTADOS.filter(e=>usados.has(e));
+  const parada = (clave, nombre, n, tono, late)=>
+    `<button class="parada ${filtro.estado===clave?'on':''} ${n?'':'vacia'} ${late?'late':''}"
+       data-est="${clave}" style="--tono:${tono}" aria-pressed="${filtro.estado===clave}"
+       aria-label="${esc(nombre)}: ${esc(t('nCarretes', n))}">
+       <span class="cuenta">${n}</span>
+       <span class="riel"><i class="marca"></i></span>
+       <span class="nombre">${esc(nombre)}</span>
+     </button>`;
+  $('f-estados').innerHTML =
+    parada('', t('todos'), est.carretes.length, 'var(--texto2)', false) +
+    visibles.map(e=>parada(e, t('estados')[e], est.carretes.filter(r=>r.estado===e).length,
+      `var(--c-${e})`, LATEN.includes(e))).join('');
+  $('f-estados').querySelectorAll('.parada').forEach(b=>b.onclick = ()=>{
+    filtro.estado = (filtro.estado === b.dataset.est) ? '' : b.dataset.est;
+    pinta();
+  });
+
+  // ── vista ──
+  $('vista').innerHTML =
+    `<button data-vista="camara" class="${vista==='camara'?'on':''}">${esc(t('porCamara'))}</button>` +
+    `<span class="barra">/</span>` +
+    `<button data-vista="estado" class="${vista==='estado'?'on':''}">${esc(t('porEstado'))}</button>`;
+  $('vista').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    vista = b.dataset.vista; localStorage.setItem('almendros-vista', vista); pinta();
+  });
+
+  // ── filtrado ──
+  const q = filtro.q.trim().toLowerCase();
+  const visto = est.carretes.filter(r=>{
+    if(filtro.estado && r.estado !== filtro.estado) return false;
+    if(filtro.camara && r.camara !== filtro.camara) return false;
+    if(q && !CAMPOS.map(c=>r[c]).join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  // ── agrupación ──
+  const grupos = [];
+  if(vista === 'estado'){
+    ESTADOS.forEach(e=>{
+      const rolls = visto.filter(r=>r.estado===e);
+      if(rolls.length) grupos.push({titulo:t('estados')[e], rolls});
+    });
+  }else{
+    est.camaras.forEach(c=>{
+      const rolls = visto.filter(r=>r.camara===c);
+      if(rolls.length) grupos.push({titulo:c, rolls});
+    });
+  }
+
+  $('lista').innerHTML = grupos.map(g=>{
+    const rolls = g.rolls.slice().sort((a,b)=>a.codigo.localeCompare(b.codigo,'es',{numeric:true}));
+    return `<section class="grupo">
+      <div class="grupo-cab"><h2>${esc(g.titulo)}</h2><span class="cuenta">${esc(t('nCarretes', rolls.length))}</span></div>
+      ${rolls.map(fila).join('')}
+    </section>`;
+  }).join('');
+
+  $('lista').querySelectorAll('.carrete').forEach(el=>{
+    el.onclick = ev=>{ if(!ev.target.closest('.etiqueta, .marcas a')) abreFicha(el.dataset.id); };
+    el.onkeydown = ev=>{
+      if((ev.key === 'Enter' || ev.key === ' ') && ev.target === el){ ev.preventDefault(); abreFicha(el.dataset.id); }
+    };
+    const et = el.querySelector('.etiqueta');
+    if(et){
+      et.onclick = ev=>{ ev.stopPropagation(); avanza(el.dataset.id); };
+      et.onkeydown = ev=>{
+        if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); ev.stopPropagation(); avanza(el.dataset.id); }
+      };
+    }
+  });
+
+  // ── contador a cero ──
+  const nada = !est.carretes.length && !q && !filtro.estado && !filtro.camara;
+  const camVacia = filtro.camara && !est.carretes.some(r=>r.camara===filtro.camara);
+  $('vacio-tit').textContent = nada ? t('bienvenidaTit') : camVacia ? t('camaraVaciaTit') : t('sinResultadosTit');
+  $('vacio-txt').textContent = nada ? t('bienvenida') : camVacia ? t('camaraVacia', filtro.camara) : t('sinResultados');
+  $('vacio').hidden = visto.length > 0;
+
+  pintaSumario();
+  $('pie-ver').textContent = `Almendros ${VERSION}`;
+  $('pie-carpeta').textContent = conectado && carpeta ? carpeta.name + '/' : '';
+
+  const listas = {'dl-camaras':est.camaras, 'dl-pelis':unicos('pelicula'),
+                  'dl-labs':unicos('laboratorio'), 'dl-reveladores':unicos('revelador')};
+  Object.entries(listas).forEach(([id, vals])=>{
+    $(id).innerHTML = vals.map(v=>`<option value="${esc(v)}">`).join('');
+  });
+}
+function unicos(campo){
+  return [...new Set(est.carretes.map(r=>r[campo]).filter(Boolean))].sort(ordenTexto);
+}
+
+function fila(r){
+  const tono = `var(--c-${r.estado})`;
+  const late = LATEN.includes(r.estado) ? ' late' : '';
+  const sig = siguienteEstado(r);
+  const bajo = [vista === 'estado' ? r.camara : '', r.formato, r.exposiciones].filter(Boolean).join(' · ');
+  const receta = r.flujo === 'casa'
+    ? [r.revelador, r.dilucion, r.tiempo].filter(Boolean).join(' · ')
+    : (r.pedido ? t('pedidoN', r.pedido) : '');
+  const marcas = [];
+  if(r.archivo) marcas.push(`<span title="${esc(r.archivo)}">▪</span>`);
+  if(r.escaneos) marcas.push(/^https?:\/\//i.test(r.escaneos)
+    ? `<a href="${esc(r.escaneos)}" target="_blank" rel="noopener noreferrer" title="${esc(r.escaneos)}">↗</a>`
+    : `<span title="${esc(r.escaneos)}">⤓</span>`);
+  return `<div class="carrete" data-id="${esc(r.id)}" style="--tono:${tono}" tabindex="0" role="button" aria-label="${esc(r.codigo)}">
+    <span class="col-codigo"><span class="codigo">${esc(r.codigo)}</span>${bajo?`<span class="bajo-codigo">${esc(bajo)}</span>`:''}</span>
+    <span class="col-peli peli">${esc(r.pelicula)}${r.iso?`<span class="iso">${esc(r.iso)}</span>`:''}</span>
+    <span class="col-estado"><span class="etiqueta${late}" style="--tono:${tono}" role="button" tabindex="0"
+      title="${sig?esc(t('pasarA', t('estados')[sig])):''}"
+      aria-label="${esc(t('estados')[r.estado])}${sig?'. '+esc(t('pasarA', t('estados')[sig])):''}"
+      >${esc(t('estados')[r.estado])}${sig?'<i class="flecha">›</i>':''}</span>${
+      receta?`<span class="receta">${esc(receta)}</span>`:''}</span>
+    <span class="fechas">${r.carga?`<b>${esc(r.carga)}</b>`:'—'}<span class="flecha">→</span>${r.fin?`<b>${esc(r.fin)}</b>`:'—'}${
+      r.revelado?`<br>${esc(t('revFecha', r.revelado))}`:''}</span>
+    <span class="notas">${marcas.length?`<span class="marcas">${marcas.join(' ')}</span>`:''}${esc((r.notas||'').replace(/\n/g,' · '))}</span>
+  </div>`;
+}
+
+/* ── avanzar de estado desde la tira ─────────────────────────────── */
+function avanza(id){
+  const r = est.carretes.find(x=>x.id===id);
+  if(!r) return;
+  const sig = siguienteEstado(r);
+  if(!sig) return;
+  const antes = r.estado;
+  r.estado = sig; marcaCarrete(r);
+  guarda(t('avanzado', r.codigo, t('estados')[sig]), ()=>{
+    const v = est.carretes.find(x=>x.id===id);
+    if(v){ v.estado = antes; marcaCarrete(v); guarda(); }
+  });
+}
+
+/* ── cámaras ─────────────────────────────────────────────────────── */
+function abreNuevaCamara(){
+  const i = document.createElement('input');
+  i.className = 'cam-nueva'; i.placeholder = t('nuevaCamara'); i.maxLength = 40;
+  i.setAttribute('aria-label', t('nuevaCamara'));
+  $('cam-add').replaceWith(i);
+  i.focus();
+  let hecho = false;
+  const fin = ok=>{
+    if(hecho) return;
+    hecho = true;
+    const nombre = i.value.trim();
+    if(ok && nombre) anadeCamara(nombre); else pinta();
+  };
+  i.onkeydown = e=>{
+    if(e.key === 'Enter') fin(true);
+    else if(e.key === 'Escape'){ e.stopPropagation(); fin(false); }
+  };
+  i.onblur = ()=>fin(true);
+}
+function anadeCamara(nombre){
+  nombre = (nombre||'').trim();
+  if(!nombre){ pinta(); return; }
+  if(est.camaras.some(c=>!c.localeCompare(nombre,'es',{sensitivity:'base'}))){
+    avisa(t('camYaEsta')); pinta(); return;
+  }
+  est.camaras.push(nombre);
+  est.camaras.sort(ordenTexto);
+  est.camarasMod[nombre] = ahora();
+  desentierra('cam:'+nombre);
+  guarda(t('camAnadida', nombre));
+}
+function quitaCamara(nombre){
+  if(est.carretes.some(r=>r.camara===nombre)) return;   // solo se quitan las que están vacías
+  est.camaras = est.camaras.filter(c=>c!==nombre);
+  entierra('cam:'+nombre);
+  if(filtro.camara === nombre) filtro.camara = '';
+  guarda(t('camQuitada', nombre), ()=>{
+    est.camaras.push(nombre); est.camaras.sort(ordenTexto);
+    est.camarasMod[nombre] = ahora(); desentierra('cam:'+nombre);
+    guarda();
+  });
+}
+
+/* ── la ficha (cajón lateral) ────────────────────────────────────── */
+const fichaAbierta = ()=> $('velo').classList.contains('abierto');
+let flujoFicha = 'lab', estadoFicha = 'Cargado';
+
+/* El estado vive en `estadoFicha`, no en el desplegable: al cambiar de flujo
+   las opciones se rehacen, y leerlas de vuelta perdería el valor elegido. */
+function pintaFlujo(){
+  document.querySelectorAll('#sel-flujo button').forEach(b=>b.classList.toggle('on', b.dataset.flujo===flujoFicha));
+  $('g-lab').hidden = flujoFicha !== 'lab';
+  $('g-casa').hidden = flujoFicha !== 'casa';
+  if(!ESTADOS.includes(estadoFicha)) estadoFicha = 'Cargado';
+  const lista = FLUJOS[flujoFicha] || FLUJOS.lab;
+  const usar = lista.includes(estadoFicha) ? lista : [estadoFicha, ...lista];
+  $('m-estado').innerHTML = usar.map(e=>`<option value="${e}">${esc(t('estados')[e])}</option>`).join('');
+  $('m-estado').value = estadoFicha;
+  pintaSelloFicha();
+}
+function pintaSelloFicha(){
+  const e = estadoFicha;
+  $('ficha-sello').innerHTML = `<span class="etiqueta${LATEN.includes(e)?' late':''}" style="--tono:var(--c-${e}); cursor:default">${esc(t('estados')[e])}</span>`;
+}
+function abreFicha(id){
+  editId = id;
+  const nuevo = {id:'', codigo:'', camara:filtro.camara||'', pelicula:'', iso:'', formato:'', exposiciones:'',
+    estado:'Cargado', flujo:est.ajustes.flujo||'lab', laboratorio:'', pedido:'', revelador:'', dilucion:'',
+    tiempo:'', temperatura:'', carga:'', fin:'', revelado:'', archivo:'', escaneos:'', notas:''};
+  const r = id ? est.carretes.find(x=>x.id===id) : nuevo;
+  if(!r) return;
+  if(!id && r.camara) r.codigo = siguienteCodigo(r.camara);
+  if(!id){                                     // hereda de la última ficha de esa cámara
+    const previos = est.carretes.filter(x=>x.camara===r.camara);
+    const ult = previos[previos.length-1];
+    if(ult){ r.formato = ult.formato; r.exposiciones = ult.exposiciones; r.laboratorio = ult.laboratorio; }
+  }
+  // solo los campos de verdad: 'flujo' y 'estado' viven en sus propias variables
+  CAMPOS.forEach(c=>{ const el = $('m-'+c); if(el && 'value' in el && el.tagName !== 'SELECT') el.value = r[c] || ''; });
+  flujoFicha = r.flujo === 'casa' ? 'casa' : 'lab';
+  estadoFicha = r.estado;
+  pintaFlujo();
+  $('ficha-tit').textContent = id ? r.codigo : t('nuevoCarrete');
+  $('ficha-sub').textContent = id ? [r.camara, r.pelicula].filter(Boolean).join(' · ') : '';
+  $('btn-borrar').style.visibility = id ? 'visible' : 'hidden';
+  $('velo').classList.add('abierto');
+  ($('m-codigo').value ? $('m-pelicula') : $('m-codigo')).focus();
+}
+function cierraFicha(){ $('velo').classList.remove('abierto'); editId = null; }
+
+function guardaFicha(){
+  const codigo = $('m-codigo').value.trim();
+  if(!codigo){ avisa(t('faltaCodigo')); $('m-codigo').focus(); return; }
+  const camara = $('m-camara').value.trim() || codigo.replace(/[-_\s]*\d+$/,'') || '—';
+  if(!est.camaras.includes(camara)){
+    est.camaras.push(camara); est.camaras.sort(ordenTexto);
+    est.camarasMod[camara] = ahora(); desentierra('cam:'+camara);
+  }
+  const r = {id: editId || uid(), mod: ahora()};
+  CAMPOS.forEach(c=>{ const el = $('m-'+c); r[c] = (el && 'value' in el) ? el.value.trim() : ''; });
+  r.camara = camara; r.flujo = flujoFicha; r.estado = estadoFicha;
+  if(r.flujo === 'casa' && r.estado === 'Recogido') r.estado = 'Revelado';
+  est.ajustes.flujo = r.flujo;                 // el último flujo usado manda para el siguiente
+  const i = est.carretes.findIndex(x=>x.id===r.id);
+  if(i >= 0) est.carretes[i] = r; else est.carretes.push(r);
+  cierraFicha();
+  guarda(t('hechoGuardado'));
+}
+function borraFicha(){
+  const id = editId;
+  const r = est.carretes.find(x=>x.id===id);
+  if(!r) return;
+  const copia = Object.assign({}, r);
+  est.carretes = est.carretes.filter(x=>x.id!==id);
+  entierra(id);
+  cierraFicha();
+  guarda(t('hechoEliminado'), ()=>{
+    desentierra(id);
+    est.carretes.push(marcaCarrete(copia));
+    if(copia.camara && !est.camaras.includes(copia.camara)){
+      est.camaras.push(copia.camara); est.camaras.sort(ordenTexto);
+      est.camarasMod[copia.camara] = ahora();
+    }
+    guarda();
+  });
+}
+
+/* ── menú ────────────────────────────────────────────────────────── */
+function pintaMenu(){
+  const m = $('menu');
+  const item = (txt, fn)=>{
+    const b = document.createElement('button');
+    b.className = 'item'; b.textContent = txt; b.setAttribute('role','menuitem');
+    b.onclick = ()=>{ cierraMenu(); fn(); };
+    m.appendChild(b);
+  };
+  const sec = txt=>{ const d = document.createElement('div'); d.className='sec'; d.textContent=txt; m.appendChild(d); };
+  const linea = ()=>m.appendChild(document.createElement('hr'));
+  const segmento = (opciones, activo, fn)=>{
+    const d = document.createElement('div'); d.className = 'segmento';
+    opciones.forEach(([val, txt])=>{
+      const b = document.createElement('button');
+      b.textContent = txt; b.classList.toggle('on', val === activo);
+      b.onclick = ()=>{ fn(val); pintaMenu(); };
+      d.appendChild(b);
+    });
+    m.appendChild(d);
+  };
+  m.innerHTML = '';
+  segmento([['es','ES'],['en','EN']], lang, v=>{
+    lang = v; localStorage.setItem('almendros-lang', v); aplicaIdioma(); pinta();
+    if(!$('conexion').hidden && repintaConexion) repintaConexion();
+  });
+  segmento([['oscuro', t('temaOscuro')],['claro', t('temaClaro')]], tema, ponTema);
+  linea();
+  sec(t('mDatos'));
+  item(t('mCopia'), descargaCopia);
+  item(t('mAbrir'), ()=>$('entrada-archivo').click());
+  item(t('mCsv'), descargaCsv);
+  linea();
+  sec(t('mCarpeta'));
+  if(soportaFSA) item(conectado ? t('mCambiarCarpeta') : t('mConectar'), cambiaCarpeta);
+  item(t('mImprimir'), ()=>window.print());
+  linea();
+  item(t('mAtajos'), hojaAtajos);
+  item(t('mAcerca'), hojaAcerca);
+}
+function abreMenu(){ pintaMenu(); $('menu').hidden = false; $('btn-menu').setAttribute('aria-expanded','true'); }
+function cierraMenu(){ $('menu').hidden = true; $('btn-menu').setAttribute('aria-expanded','false'); }
+
+/* ── hojas ───────────────────────────────────────────────────────── */
+function abreHoja(titulo, html){
+  $('hoja-tit').textContent = titulo;
+  $('hoja-cuerpo').innerHTML = html;
+  $('velo-hoja').classList.add('abierto');
+  $('hoja-cerrar').focus();
+}
+const cierraHoja = ()=>$('velo-hoja').classList.remove('abierto');
+function hojaAtajos(){
+  const filas = [['N', t('atajoNuevo')], ['/', t('atajoBuscar')], ['Esc', t('atajoCerrar')],
+                 ['Ctrl + ⏎', t('atajoGuardar')]];
+  abreHoja(t('atajos'), '<dl>' + filas.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('') + '</dl>');
+}
+function hojaAcerca(){
+  abreHoja(t('acerca'), `<p>${t('acercaTxt')}</p><p style="font-family:var(--f-mono);font-size:11.5px;opacity:.7">Almendros ${VERSION} · MIT</p>`);
+}
+
+/* ── entrada y salida de datos ───────────────────────────────────── */
+function descarga(nombre, texto, tipo){
+  const url = URL.createObjectURL(new Blob([texto], {type:tipo}));
+  const a = document.createElement('a');
+  a.href = url; a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function descargaCopia(){
+  descarga(`almendros-${new Date().toISOString().slice(0,10)}.json`,
+    JSON.stringify(instantanea(), null, 1), 'application/json');
+  localStorage.setItem('almendros-sincopia', '0');
+  avisoFijo = false; ocultaAviso();
+  avisa(t('copiaHecha'));
+}
+function csvCampo(v, sep){
+  const s = (v==null ? '' : String(v));
+  return /["\n\r]|,|;/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+function generaCsv(sep){
+  const cab = CAMPOS.map(c=>t('csv')[c] || c);
+  const filas = est.carretes.slice()
+    .sort((a,b)=>(a.camara+a.codigo).localeCompare(b.camara+b.codigo,'es',{numeric:true}))
+    .map(r=>CAMPOS.map(c=>{
+      if(c === 'estado') return t('estados')[r.estado] || r.estado;
+      if(c === 'flujo') return r.flujo === 'casa' ? t('flujoCasa') : t('flujoLab');
+      return r[c];
+    }));
+  return [cab, ...filas].map(f=>f.map(v=>csvCampo(v, sep)).join(sep)).join('\r\n');
+}
+function descargaCsv(){
+  const sep = lang === 'es' ? ';' : ',';
+  descarga(`almendros-${new Date().toISOString().slice(0,10)}.csv`,
+    '﻿' + generaCsv(sep), 'text/csv;charset=utf-8');
+  avisa(t('csvHecho'));
+}
+async function importa(file){
+  try{
+    const d = normaliza(JSON.parse(await file.text()));
+    if(!d.carretes.length && !d.camaras.length){ avisa(t('importadoNada')); return; }
+    const antes = new Map(est.carretes.map(r=>[r.id, JSON.stringify(r)]));
+    adopta(fusiona(instantanea(), d));
+    let nuevos = 0, cambiados = 0;
+    est.carretes.forEach(r=>{
+      if(!antes.has(r.id)) nuevos++;
+      else if(antes.get(r.id) !== JSON.stringify(r)) cambiados++;
+    });
+    guarda(t('importado', nuevos, cambiados));
+  }catch(e){ avisa(t('importError')); }
+}
+
+/* ── tema e idioma ───────────────────────────────────────────────── */
+let tema = localStorage.getItem('almendros-tema') || 'oscuro';
+function ponTema(v){
+  tema = v; localStorage.setItem('almendros-tema', v);
+  document.documentElement.dataset.tema = v;
+  // sin esto, los controles nativos (el desplegable de estado) se siguen
+  // dibujando con la paleta oscura del navegador aunque el tema sea claro
+  document.documentElement.style.colorScheme = (v === 'claro') ? 'light' : 'dark';
+}
+function aplicaIdioma(){
+  document.documentElement.lang = lang;
+  // El <title> del archivo es largo a propósito, para los buscadores; una vez
+  // cargada la página se cambia por uno corto y en el idioma del usuario.
+  document.title = t('tituloDoc');
+  document.querySelectorAll('[data-t]').forEach(el=>el.textContent = t(el.dataset.t));
+  document.querySelectorAll('[data-tp]').forEach(el=>el.placeholder = t(el.dataset.tp));
+  $('lomo-lema').textContent = '· ' + t('lema').toLowerCase();
+  $('q').placeholder = t('buscar');
+  $('pre-busca').textContent = t('preBusca');   // el <label> ya nombra el campo
+  $('f-camaras').setAttribute('aria-label', t('navCamaras'));
+  $('f-estados').setAttribute('aria-label', t('navEstados'));
+  if(fichaAbierta()) pintaFlujo();
+}
+
+/* ── conexión ────────────────────────────────────────────────────── */
+let repintaConexion = null;
+async function enMarcha(){
+  conectado = true;
+  $('conexion').hidden = true;
+  avisoFijo = false;
+  try{
+    const delArchivo = await leeArchivo();
+    const local = leeLocal();
+    if(localStorage.getItem(SUCIO) === '1' && local){
+      adopta(delArchivo ? fusiona(local, delArchivo) : local);
+      persiste();                                    // volcar lo que quedó pendiente
+    }else if(delArchivo && (delArchivo.carretes.length || delArchivo.camaras.length)){
+      adopta(delArchivo);
+      try{ localStorage.setItem(CLAVE, JSON.stringify(instantanea())); }catch(e){}
+      indicador('ok');
+      compruebaVersion(delArchivo.porVersion);
+    }else{
+      adopta(local || vacio()); persiste();
+    }
+  }catch(e){                                          // aún no hay archivo: se crea al guardar
+    adopta(leeLocal() || vacio()); persiste();
+  }
+  pinta();
+}
+async function cambiaCarpeta(){
+  if(await conectar(true)) await enMarcha();
+}
+function compara(a, b){
+  const pa = (a||'0').split('.').map(Number), pb = (b||'0').split('.').map(Number);
+  for(let i=0;i<3;i++){ if((pa[i]||0) !== (pb[i]||0)) return (pa[i]||0) - (pb[i]||0); }
+  return 0;
+}
+function compruebaVersion(otra){
+  if(otra && compara(otra, VERSION) > 0)
+    muestraAviso(t('avisoVieja'), {txt:t('recargar'), fn:()=>location.reload()}, true);
+}
+
+function tarjeta({texto, botones, mini, saltar}){
+  $('con-lema').textContent = t('lema');
+  $('con-texto').innerHTML = texto;
+  const cont = $('con-botones');
+  cont.innerHTML = '';
+  botones.forEach(b=>{
+    const el = document.createElement('button');
+    el.textContent = b.txt;
+    if(b.principal) el.className = 'primario';
+    el.onclick = b.fn;
+    cont.appendChild(el);
+  });
+  $('con-mini').textContent = mini || '';
+  $('con-mini').hidden = !mini;
+  $('con-saltar').textContent = saltar || '';
+  $('con-saltar').hidden = !saltar;
+  $('con-saltar').onclick = empiezaLocal;
+  $('con-saltar').onkeydown = e=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); empiezaLocal(); } };
+  $('con-ver').textContent = `v${VERSION}`;
+  $('conexion').hidden = false;
+}
+async function pideConexion(){
+  repintaConexion = pideConexion;
+  const guardada = await kv('get','carpeta').catch(()=>null);
+  tarjeta({
+    texto: guardada ? t('conRepite') : t('conPrimera'),
+    botones: [{txt: guardada ? t('conContinuar') : t('conElegir'), principal:true,
+               fn: async ()=>{ if(await conectar(true)) await enMarcha(); }}],
+    mini: t('conMini'),
+    saltar: t('conSaltar')
+  });
+}
+const DIR_BRAVE = 'brave://flags/#file-system-access-api';
+function sinCarpeta(){
+  repintaConexion = sinCarpeta;
+  conectado = false;
+  indicador('local');
+  const esBrave = !!navigator.brave;
+  if(esBrave){
+    tarjeta({
+      texto: t('brave').replace('__DIR__', DIR_BRAVE),
+      botones: [
+        {txt:t('braveCopiar'), principal:true, fn:async ()=>{
+          try{ await navigator.clipboard.writeText(DIR_BRAVE); }
+          catch(e){ const i = $('con-dir'); if(i){ i.select(); document.execCommand('copy'); } }
+          avisa(t('braveCopiada'));
+        }},
+        {txt:t('conAqui'), fn:empiezaLocal}
+      ],
+      mini:'', saltar:''
+    });
+  }else{
+    tarjeta({
+      texto: `<b>${esc(t('sinFSAtit'))}.</b><br><br>${t('sinFSA')}`,
+      botones: [{txt:t('conAqui'), principal:true, fn:empiezaLocal}],
+      mini:'', saltar:''
+    });
+  }
+}
+function empiezaLocal(){
+  $('conexion').hidden = true;
+  adopta(leeLocal() || vacio());
+  indicador('local');
+  pinta();
+}
+
+/* ── al volver a la pestaña, releer por si cambió desde otro sitio ──
+   Nunca con una escritura pendiente: los diálogos del sistema devuelven
+   el foco justo antes de que se escriba el cambio. */
+async function resincroniza(){
+  if(!conectado || demo || fichaAbierta()) return;
+  if(escrituraPendiente || localStorage.getItem(SUCIO) === '1') return;
+  try{
+    const d = await leeArchivo();
+    if(escrituraPendiente || localStorage.getItem(SUCIO) === '1') return;
+    if(!d) return;
+    const combinado = fusiona(instantanea(), d);
+    if(JSON.stringify(instantaneaDe(combinado)) !== JSON.stringify(instantanea())){
+      adopta(combinado);
+      try{ localStorage.setItem(CLAVE, JSON.stringify(instantanea())); }catch(e){}
+      pinta();
+    }
+    compruebaVersion(d.porVersion);
+  }catch(e){}
+}
+window.addEventListener('focus', resincroniza);
+
+/* ── eventos ─────────────────────────────────────────────────────── */
+$('btn-nuevo').onclick = ()=>abreFicha(null);
+$('btn-guardar').onclick = guardaFicha;
+$('btn-cancelar').onclick = cierraFicha;
+$('btn-borrar').onclick = borraFicha;
+$('hoja-cerrar').onclick = cierraHoja;
+$('q').oninput = e=>{ filtro.q = e.target.value; pinta(); };
+$('m-estado').onchange = ()=>{ estadoFicha = $('m-estado').value; pintaSelloFicha(); };
+$('entrada-archivo').onchange = e=>{
+  const f = e.target.files[0];
+  if(f) importa(f);
+  e.target.value = '';
+};
+document.querySelectorAll('#sel-flujo button').forEach(b=>b.onclick = ()=>{
+  flujoFicha = b.dataset.flujo; pintaFlujo();
+});
+document.querySelectorAll('.hoy').forEach(b=>b.onclick = ()=>{
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2,'0'), mm = String(d.getMonth()+1).padStart(2,'0');
+  $(b.dataset.hoy).value = `${dd}/${mm}/${String(d.getFullYear()).slice(2)}`;
+});
+$('btn-menu').onclick = e=>{ e.stopPropagation(); $('menu').hidden ? abreMenu() : cierraMenu(); };
+// `isConnected` evita cerrar el menú cuando el propio botón pulsado acaba de ser
+// reemplazado al repintarlo (cambiar de idioma o de tema): ya no está en el árbol
+// y `closest` no encontraría el menú.
+document.addEventListener('click', e=>{
+  if(e.target.isConnected && !e.target.closest('#menu, #btn-menu')) cierraMenu();
+});
+
+/* cerrar tocando el fondo, pero solo si la pulsación empieza y acaba en él:
+   arrastrar desde un campo para seleccionar texto no debe cerrar la ficha */
+[['velo', cierraFicha], ['velo-hoja', cierraHoja]].forEach(([id, cerrar])=>{
+  let enFondo = false;
+  $(id).onpointerdown = e=>{ enFondo = (e.target.id === id); };
+  $(id).onpointerup = e=>{ if(enFondo && e.target.id === id) cerrar(); enFondo = false; };
+});
+
+document.addEventListener('keydown', e=>{
+  const escribiendo = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if(e.key === 'Escape'){
+    if(!$('menu').hidden) return cierraMenu();
+    if($('velo-hoja').classList.contains('abierto')) return cierraHoja();
+    if(fichaAbierta()) return cierraFicha();
+    if(filtro.q){ filtro.q = ''; $('q').value = ''; pinta(); }
+    return;
+  }
+  if(fichaAbierta()){
+    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); guardaFicha(); }
+    return;
+  }
+  if(escribiendo) return;
+  if(e.key === 'n' || e.key === 'N'){ e.preventDefault(); abreFicha(null); }
+  else if(e.key === '/'){ e.preventDefault(); $('q').focus(); }
+});
+
+/* arrastrar un archivo sobre la ventana lo importa */
+window.addEventListener('dragover', e=>{ if(e.dataTransfer.types.includes('Files')) e.preventDefault(); });
+window.addEventListener('drop', e=>{
+  const f = e.dataTransfer.files[0];
+  if(f && /\.json$/i.test(f.name)){ e.preventDefault(); importa(f); }
+});
+
+/* otras pestañas del mismo navegador */
+try{
+  canal = new BroadcastChannel('almendros');
+  canal.onmessage = ev=>{
+    if(ev.data && ev.data.tipo === 'guardado'){
+      compruebaVersion(ev.data.version);
+      resincroniza();
+    }
+  };
+}catch(e){}
+
+/* ── demostración ────────────────────────────────────────────────── */
+function datosDemo(){
+  const hoy = ahora();
+  const r = (o)=>Object.assign({id:uid(), mod:hoy, codigo:'', camara:'', pelicula:'', iso:'', formato:'35mm',
+    exposiciones:'36', estado:'Cargado', flujo:'lab', laboratorio:'', pedido:'', revelador:'', dilucion:'',
+    tiempo:'', temperatura:'', carga:'', fin:'', revelado:'', archivo:'', escaneos:'', notas:''}, o);
+  // Los carretes son inventados. El texto libre va en el idioma de la interfaz:
+  // la demostración es el escaparate y no debe llegar a medias.
+  const es = lang === 'es';
+  const T = {
+    lab:        es ? 'Laboratorio Duero' : 'Duero Film Lab',
+    archivador: es ? 'Archivador 1 · funda' : 'Binder 1 · sleeve',
+    puerto:     es ? 'Noche en el puerto. Las últimas, a pulso.' : 'Night at the harbour. The last few handheld.',
+    boda:       es ? 'Media película en una boda.' : 'Half a roll at a wedding.',
+    estudio:    es ? 'Retratos en el estudio, luz de ventana.' : 'Studio portraits, window light.',
+    sierra:     es ? 'Sierra. Contraluces muy fuertes; revelar tirando 1 punto.'
+                   : 'Mountains. Very strong backlight; pull one stop.',
+    ferias:     es ? 'Ferias de noche. El halo rojo es de la propia película.'
+                   : 'Fairground at night. The red halation is the film itself.',
+    antes:      es ? '«antes del viaje»' : '“before the trip”',
+    mes:        es ? 'julio' : 'july'
+  };
+  const d = vacio();
+  d.carretes = [
+    r({codigo:'Leica01', camara:'Leica M6', pelicula:'Kodak Tri-X 400', iso:es?'a 1600':'at 1600', estado:'Revelando',
+       flujo:'casa', revelador:'HC-110', dilucion:'1+31', tiempo:'8:30', temperatura:'20 °C',
+       carga:'02/07/26', fin:'19/07/26', notas:T.puerto}),
+    r({codigo:'Leica02', camara:'Leica M6', pelicula:'Portra 400', estado:'Cargado', carga:'21/07/26',
+       notas:T.boda}),
+    r({codigo:'Rollei01', camara:'Rolleiflex', pelicula:'Ilford HP5+', formato:'120', exposiciones:'12',
+       estado:'Revelado', flujo:'lab', laboratorio:T.lab, pedido:'4821', carga:'12/06/26',
+       fin:'28/06/26', notas:T.estudio}),
+    r({codigo:'Rollei02', camara:'Rolleiflex', pelicula:'Kodak Ektar 100', formato:'120', exposiciones:'12',
+       estado:'Recogido', flujo:'lab', laboratorio:T.lab, pedido:'4788', carga:'01/06/26',
+       fin:'09/06/26', revelado:'14/06/26', archivo:T.archivador+' 07'}),
+    r({codigo:'Nikon07', camara:'Nikon FM2', pelicula:'Fomapan 100', estado:'Revelar',
+       carga:T.antes, fin:T.mes, notas:T.sierra}),
+    r({codigo:'Nikon06', camara:'Nikon FM2', pelicula:'Cinestill 800T', estado:'Escaneado', flujo:'lab',
+       laboratorio:T.lab, pedido:'4610', carga:'02/05/26', fin:'17/05/26', revelado:'21/05/26',
+       archivo:T.archivador+' 03', escaneos:'https://example.org/nikon06',
+       notas:T.ferias}),
+    r({codigo:'Nikon05', camara:'Nikon FM2', pelicula:'Ilford Delta 3200', estado:'Archivado', flujo:'casa',
+       revelador:'DD-X', dilucion:'1+4', tiempo:'9:00', temperatura:'20 °C', carga:'10/04/26',
+       fin:'25/04/26', revelado:'26/04/26', archivo:T.archivador+' 01'})
+  ];
+  d.camaras = [...new Set(d.carretes.map(x=>x.camara))].sort(ordenTexto);
+  d.camaras.forEach(c=>d.camarasMod[c] = hoy);
+  d.actualizado = hoy;
+  return d;
+}
+
+/* ── pruebas internas (#pruebas) ─────────────────────────────────── */
+function pruebas(){
+  const res = [];
+  const ok = (nombre, cond)=>res.push([nombre, !!cond]);
+  const T0 = '2026-01-01T00:00:00.000Z', T1 = '2026-06-01T00:00:00.000Z', T2 = '2026-08-01T00:00:00.000Z';
+  const carrete = (id, extra)=>Object.assign({id, codigo:id, camara:'C', estado:'Cargado', flujo:'lab', mod:T1}, extra);
+
+  // normalización de los tres formatos históricos
+  const v0 = normaliza([{id:'a', codigo:'A', camara:'Hasel', estado:'Terminado'}]);
+  ok('formato antiguo (lista suelta)', v0.carretes.length === 1 && v0.camaras[0] === 'Hasel');
+  ok('«Terminado» pasa a «Revelar»', v0.carretes[0].estado === 'Revelar');
+  const v1 = normaliza({camaras:['Vacia'], carretes:[{id:'a', codigo:'A', camara:'Hasel'}]});
+  ok('cámara sin carretes se conserva', v1.camaras.includes('Vacia') && v1.camaras.includes('Hasel'));
+  ok('todo carrete trae fecha de cambio', !!v1.carretes[0].mod);
+  const vc = normaliza({carretes:[{id:'a', camara:'C', estado:'Recogido', revelador:'HC-110'}]});
+  ok('revelado en casa no puede estar «Recogido»', vc.carretes[0].flujo === 'casa' && vc.carretes[0].estado === 'Revelado');
+
+  // fusión entre dos ordenadores
+  const base = normaliza({camaras:['C'], carretes:[carrete('r1'), carrete('r2')]});
+  const A = JSON.parse(JSON.stringify(base)), B = JSON.parse(JSON.stringify(base));
+  A.carretes.push(carrete('r3', {mod:T2}));
+  B.carretes.push(carrete('r4', {mod:T2}));
+  const f1 = fusiona(A, B);
+  ok('altas en los dos lados sobreviven', f1.carretes.length === 4);
+
+  const C = JSON.parse(JSON.stringify(base)), D = JSON.parse(JSON.stringify(base));
+  C.carretes[0].estado = 'Revelar'; C.carretes[0].mod = T2;
+  const f2 = fusiona(C, D);
+  ok('gana la edición más reciente', f2.carretes.find(r=>r.id==='r1').estado === 'Revelar');
+
+  const E = JSON.parse(JSON.stringify(base)), F = JSON.parse(JSON.stringify(base));
+  E.carretes = E.carretes.filter(r=>r.id!=='r1'); E.papelera = [{k:'r1', mod:T2}];
+  const f3 = fusiona(E, F);
+  ok('un borrado no resucita', !f3.carretes.some(r=>r.id==='r1'));
+  const G = JSON.parse(JSON.stringify(base)); G.carretes[0].mod = T2;   // editado DESPUÉS de borrarlo
+  const f4 = fusiona(E, G);
+  ok('editar después de borrar recupera el carrete', f4.carretes.some(r=>r.id==='r1'));
+
+  const H = normaliza({camaras:['C','Vacia'], carretes:[carrete('r1')]});
+  H.camarasMod['Vacia'] = T0;
+  const I = JSON.parse(JSON.stringify(H));
+  I.camaras = I.camaras.filter(c=>c!=='Vacia'); I.papelera = [{k:'cam:Vacia', mod:T2}];
+  ok('quitar una cámara vacía se propaga', !fusiona(H, I).camaras.includes('Vacia'));
+  const J = JSON.parse(JSON.stringify(H)); J.camarasMod['Vacia'] = T2;  // añadida de nuevo, más tarde
+  ok('volver a añadirla gana si es posterior', fusiona(J, I).camaras.includes('Vacia'));
+  ok('una cámara con carretes nunca desaparece', fusiona(H, I).camaras.includes('C'));
+
+  // códigos y estados
+  const guardado = est;
+  est = normaliza({carretes:[carrete('x', {codigo:'Kiev-009', camara:'Kiev'}), carrete('y', {codigo:'Kiev-010', camara:'Kiev'})]});
+  ok('sugiere el código siguiente con ceros', siguienteCodigo('Kiev') === 'Kiev-011');
+  ok('cámara nueva empieza en 01', siguienteCodigo('Nueva') === 'Nueva01');
+  est = guardado;
+  ok('el laboratorio pasa por «Recogido»', siguienteEstado({estado:'Revelado', flujo:'lab'}) === 'Recogido');
+  ok('en casa se salta «Recogido»', siguienteEstado({estado:'Revelado', flujo:'casa'}) === 'Escaneado');
+  ok('el final no avanza más', siguienteEstado({estado:'Archivado', flujo:'lab'}) === null);
+
+  // hoja de cálculo
+  ok('las comillas se escapan', csvCampo('dice "hola"', ';') === '"dice ""hola"""');
+  ok('los saltos de línea se entrecomillan', csvCampo('a\nb', ';') === '"a\nb"');
+  ok('el separador obliga a entrecomillar', csvCampo('a;b', ';') === '"a;b"');
+
+  // versiones
+  ok('compara versiones', compara('2.1.0','2.0.9') > 0 && compara('2.0.0','2.0.0') === 0 && compara('1.9.9','2.0.0') < 0);
+
+  const fallos = res.filter(r=>!r[1]).length;
+  document.body.innerHTML = `<div id="pruebas"><h2>Almendros ${VERSION} · pruebas</h2>` +
+    res.map(([n, o])=>`<div class="${o?'ok':'mal'}">${o?'✓':'✗'} ${esc(n)}</div>`).join('') +
+    `<p style="margin-top:20px" class="${fallos?'mal':'ok'}">${res.length - fallos}/${res.length} correctas</p></div>`;
+  document.title = (fallos ? '✗ ' : '✓ ') + 'pruebas · Almendros';
+}
+
+/* ── arranque ────────────────────────────────────────────────────── */
+(async function inicio(){
+  ponTema(tema);
+  aplicaIdioma();
+
+  if(location.hash === '#pruebas'){ pruebas(); return; }
+
+  if(location.hash === '#demo'){
+    demo = true;
+    adopta(datosDemo());
+    $('conexion').hidden = true;
+    pinta();
+    muestraAviso(t('avisoDemo'), null, true);
+    return;
+  }
+
+  adopta(leeLocal() || vacio());     // pinta algo al instante
+  pinta();
+
+  if(!soportaFSA){ sinCarpeta(); return; }
+  if(await conectar(false)) await enMarcha();
+  else await pideConexion();
+})();
+</script>
+</body>
+</html>
