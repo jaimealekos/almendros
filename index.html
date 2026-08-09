@@ -14,7 +14,7 @@
 <meta property="og:title" content="Almendros · a film logbook in a single file">
 <meta property="og:description" content="Track every roll of film you shoot — camera, stock, push/pull, lab or home development — in one HTML file that saves to your own folder. No account, no server, no subscription.">
 <meta property="og:url" content="https://jaimealekos.github.io/almendros/">
-<meta property="og:image" content="https://jaimealekos.github.io/almendros/capturas/01-general.png">
+<meta property="og:image" content="https://jaimealekos.github.io/almendros/capturas/en/01-general.png">
 <meta property="og:locale" content="es_ES">
 <meta property="og:locale:alternate" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
@@ -615,7 +615,7 @@ footer{
 <script>
 "use strict";
 /* ═══════════════════════════════════════════════════════════════════
-   ALMENDROS · v1.0.0
+   ALMENDROS · v1.0.1
    Cuaderno de carretes para fotografía analógica.
 
    Decisiones de fondo:
@@ -627,7 +627,7 @@ footer{
      viaje?». Un cuaderno acepta cómo recuerdas de verdad.
    ═══════════════════════════════════════════════════════════════════ */
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 const CLAVE = 'almendros-db-v2';
 const SUCIO = 'almendros-sucio';
 const CLAVE_VIEJA = 'almendros-db-v1';
@@ -785,8 +785,16 @@ const TXT = {
     archivo:'Physical storage',escaneos:'Scans',notas:'Notes'}
  }
 };
-let lang = localStorage.getItem('almendros-lang')
-        || ((navigator.language||'').toLowerCase().startsWith('es') ? 'es' : 'en');
+/* El idioma sale, por este orden, de: la dirección (`?lang=es` o `?lang=en`, que
+   es como enlaza cada manual a «su» versión de la aplicación), lo que el usuario
+   eligiera la última vez, y por último el idioma del navegador. */
+const idiomaPedido = new URLSearchParams(location.search).get('lang');
+let lang = (idiomaPedido === 'es' || idiomaPedido === 'en') ? idiomaPedido
+         : (localStorage.getItem('almendros-lang')
+            || ((navigator.language||'').toLowerCase().startsWith('es') ? 'es' : 'en'));
+if(idiomaPedido === 'es' || idiomaPedido === 'en'){
+  try{ localStorage.setItem('almendros-lang', lang); }catch(e){}
+}
 const t = (k,...a)=>{ const v = TXT[lang][k]; return typeof v==='function' ? v(...a) : v; };
 
 /* ── estado en memoria ───────────────────────────────────────────── */

@@ -1,5 +1,10 @@
 <p align="center">
-  <img src="capturas/01-general.png" alt="Almendros: registro de carretes de fotografía analógica, agrupados por cámara y con el color de su estado" width="900">
+  <a href="README.md"><img src="https://img.shields.io/badge/English-1f2427?style=for-the-badge" alt="Read in English"></a>
+  <img src="https://img.shields.io/badge/Español-ff5b14?style=for-the-badge" alt="Español (estás aquí)">
+</p>
+
+<p align="center">
+  <img src="capturas/es/01-general.png" alt="Almendros: registro de carretes de fotografía analógica, agrupados por cámara y con el color de su estado" width="900">
 </p>
 
 # 🎞️ Almendros — registro de carretes en un solo archivo
@@ -13,14 +18,13 @@ Sin cuenta. Sin servidor. Sin cuotas. Sin rastreo. Carretes ilimitados.
 
 <p>
   <a href="LICENSE"><img alt="Licencia MIT" src="https://img.shields.io/badge/licencia-MIT-000?style=flat-square"></a>
-  <img alt="Versión 1.0.0" src="https://img.shields.io/badge/versi%C3%B3n-1.0.0-ff5b14?style=flat-square">
-  <img alt="Un archivo, 92 KB, sin dependencias" src="https://img.shields.io/badge/un%20archivo-92%20KB%20·%20sin%20dependencias-000?style=flat-square">
-  <a href="https://jaimealekos.github.io/almendros/#demo"><img alt="Demostración en vivo" src="https://img.shields.io/badge/demostraci%C3%B3n-pru%C3%A9bala-ff5b14?style=flat-square"></a>
+  <img alt="Versión 1.0.1" src="https://img.shields.io/badge/versi%C3%B3n-1.0.1-ff5b14?style=flat-square">
+  <img alt="Un archivo, 94 KB, sin dependencias" src="https://img.shields.io/badge/un%20archivo-94%20KB%20·%20sin%20dependencias-000?style=flat-square">
 </p>
 
-**[▶ Probar la demostración](https://jaimealekos.github.io/almendros/#demo)** (carretes de
-ejemplo, no se guarda nada) · **[Abrir la aplicación](https://jaimealekos.github.io/almendros/)** ·
-**[Read me in English](README.md)**
+**[▶ Probar la demostración](https://jaimealekos.github.io/almendros/?lang=es#demo)** (carretes de
+ejemplo, no se guarda nada) · **[Abrir la aplicación](https://jaimealekos.github.io/almendros/?lang=es)** ·
+**[Ir al manual](#manual)**
 
 ---
 
@@ -70,7 +74,7 @@ tienes andando.
 Baja [`index.html`](https://raw.githubusercontent.com/jaimealekos/almendros/main/index.html)
 (botón derecho → Guardar enlace como) y déjalo donde quieras: el escritorio, Documentos, un
 pincho USB. Ese archivo es la aplicación entera. También puedes usarla directamente en
-[jaimealekos.github.io/almendros](https://jaimealekos.github.io/almendros/), sin descargar
+[jaimealekos.github.io/almendros](https://jaimealekos.github.io/almendros/?lang=es), sin descargar
 nada: guarda igualmente en tu carpeta.
 
 **2. Ábrelo con doble clic.**
@@ -80,7 +84,7 @@ los únicos que saben escribir en una carpeta tuya.
 **3. Elige la carpeta.**
 La primera vez verás esto:
 
-![Pantalla de bienvenida de Almendros pidiendo elegir la carpeta donde vivirán los carretes](capturas/07-primer-arranque.png)
+![Pantalla de bienvenida de Almendros pidiendo elegir la carpeta donde vivirán los carretes](capturas/es/07-primer-arranque.png)
 
 Pulsa **Elegir la carpeta** y señala dónde quieres que vivan tus carretes. Vale una carpeta
 nueva y vacía, una del disco de red o una que ya sincronices. Si sale una pregunta, elige
@@ -97,7 +101,7 @@ Si la cámara es nueva, la añades con **+ cámara**.
 
 Pulsa **Guardar**. Arriba pondrá «guardado ✓» y el carrete ya está en tu carpeta.
 
-![Lista de carretes agrupados por cámara, cada uno con su color de estado](capturas/01-general.png)
+![Lista de carretes agrupados por cámara, cada uno con su color de estado](capturas/es/01-general.png)
 
 Eso era toda la instalación. Lo de abajo puedes leerlo otro día.
 
@@ -112,7 +116,7 @@ Cada carrete está siempre en una fase, y cada fase tiene su color:
 nada. Si te equivocas, abajo aparece un aviso con **Deshacer** — vale para los cambios de
 estado, para los carretes borrados y para las cámaras quitadas.
 
-![Fila de estados con el recuento de carretes en cada fase](capturas/02-la-via.png)
+![Fila de estados con el recuento de carretes en cada fase](capturas/es/02-la-via.png)
 
 Los números de arriba dicen cuántos carretes hay ahora mismo en cada fase. Pulsa uno y verás
 solo esos. Es la respuesta rápida a «¿qué tengo pendiente?».
@@ -132,7 +136,7 @@ En la ficha sí hay botón **Guardar**; fuera de ella, cada cambio se escribe so
    pedido) o **En casa** (revelador, dilución, tiempo, temperatura). Apunta lo que hiciste de
    verdad, no lo que decía la tabla.
 
-![Ficha lateral de un carrete revelado en casa, con revelador, dilución, tiempo y temperatura](capturas/03-ficha.png)
+![Ficha lateral de un carrete revelado en casa, con revelador, dilución, tiempo y temperatura](capturas/es/03-ficha.png)
 
 5. **Lo recoges.** Solo si fue al laboratorio: lo que revelas en casa se salta esa fase.
 6. **Lo escaneas.** En el campo **escaneos** pega la carpeta o el enlace donde han quedado
@@ -148,7 +152,7 @@ está ese negativo. Ese es el motivo entero de llevar un cuaderno.
 La lista se agrupa **por cámara** —para saber qué llevas puesto— o **por estado** —para
 saber qué te toca hacer—. Se cambia con los dos enlaces bajo la fila de colores.
 
-![Los mismos carretes agrupados por estado: qué hay que hacer](capturas/04-por-estado.png)
+![Los mismos carretes agrupados por estado: qué hay que hacer](capturas/es/04-por-estado.png)
 
 - **Buscar** — el campo de arriba mira dentro de todo: película, cámara, revelador,
   laboratorio, notas, archivador.
@@ -160,7 +164,7 @@ saber qué te toca hacer—. Se cambia con los dos enlaces bajo la fila de color
 - **Atajos** — `N` carrete nuevo · `/` buscar · `Esc` cerrar o limpiar · `Ctrl+Intro`
   guardar la ficha.
 
-![Almendros con el tema claro](capturas/05-claro.png)
+![Almendros con el tema claro](capturas/es/05-claro.png)
 
 ### Si algo va raro
 
@@ -207,7 +211,7 @@ Un carrete se apunta en diez segundos, que es justo el motivo por el que sí lo 
 —y el carrete es la unidad que importa de todas formas: es lo que maneja el laboratorio, lo
 que cabe en la funda y lo que se pierde.
 
-![Almendros en la pantalla de un móvil](capturas/06-movil.png)
+![Almendros en la pantalla de un móvil](capturas/es/06-movil.png)
 
 ## Otras herramientas que merece la pena conocer
 

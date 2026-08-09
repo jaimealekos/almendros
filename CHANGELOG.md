@@ -2,6 +2,18 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · [SemVer](https://semver.org/).
 
+## [1.0.1] — 2026-08-10
+
+### Added
+- **Language in the address**: `?lang=en` or `?lang=es` opens the app in that language and
+  remembers the choice. Each manual links to its own version of the app, so an English
+  reader never lands on a Spanish interface (and the other way round).
+
+### Changed
+- The manuals are now two complete, mirrored documents — `README.md` in English and
+  `LEEME.md` in Spanish — each with **its own set of screenshots** showing the interface in
+  that language. A language switch is the first thing on both.
+
 ## [1.0.0] — 2026-08-10
 
 First public release. Almendros grew out of a personal film log its author had been using
