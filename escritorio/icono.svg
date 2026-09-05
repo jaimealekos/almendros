@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Icono de Almendros de escritorio: el lomo perforado de la aplicación,
+       en naranja de máscara de negativo sobre negro frío, y tres fotogramas. -->
+  <rect width="1024" height="1024" fill="#090a0b"/>
+  <rect x="0" y="0" width="232" height="1024" fill="#ff5b14"/>
+  <g fill="#090a0b">
+    <rect x="76" y="104" width="80" height="80"/>
+    <rect x="76" y="288" width="80" height="80"/>
+    <rect x="76" y="472" width="80" height="80"/>
+    <rect x="76" y="656" width="80" height="80"/>
+    <rect x="76" y="840" width="80" height="80"/>
+  </g>
+  <g fill="#eef1f2">
+    <rect x="392" y="200" width="536" height="96"/>
+    <rect x="392" y="464" width="536" height="96"/>
+    <rect x="392" y="728" width="536" height="96"/>
+  </g>
+</svg>

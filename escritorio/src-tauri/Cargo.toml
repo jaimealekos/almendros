@@ -1,0 +1,23 @@
+[package]
+name = "almendros-escritorio"
+version = "1.0.0"
+edition = "2021"
+description = "Almendros de escritorio: abre index.html en una ventana propia con acceso directo a su carpeta de datos"
+publish = false
+
+[lib]
+name = "almendros_escritorio_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "Almendros"
+path = "src/main.rs"
+
+# M1 y M2 solo usan std. Las dependencias de Tauri las añade el módulo M4 (aplicación).
+[dependencies]
+tauri = { version = "2.11.5", features = [] }
+tauri-plugin-dialog = "2.7.3"
+tauri-plugin-opener = "2.5.5"
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
